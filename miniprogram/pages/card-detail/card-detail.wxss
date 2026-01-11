@@ -1,0 +1,883 @@
+/**
+ * 卡片详情页样式
+ * Requirements: 6.1
+ */
+
+.page-container {
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding-bottom: 200rpx;
+}
+
+/* ==================== 加载状态 ==================== */
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 200rpx 0;
+}
+
+.loading-spinner {
+  width: 64rpx;
+  height: 64rpx;
+  border: 4rpx solid #f0f0f0;
+  border-top-color: #1890ff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  margin-top: 24rpx;
+  font-size: 28rpx;
+  color: #999999;
+}
+
+/* ==================== 错误状态 ==================== */
+
+.error-container {
+  padding: 100rpx 32rpx;
+}
+
+/* ==================== 媒体轮播区域 ==================== */
+
+.media-section {
+  position: relative;
+  width: 100%;
+  background-color: #000000;
+}
+
+.media-swiper {
+  width: 100%;
+  height: 600rpx;
+}
+
+.media-image {
+  width: 100%;
+  height: 100%;
+  background-color: #f5f5f5;
+}
+
+.media-video {
+  width: 100%;
+  height: 100%;
+}
+
+.media-placeholder {
+  width: 100%;
+  height: 400rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+}
+
+.media-placeholder-icon {
+  font-size: 80rpx;
+  margin-bottom: 16rpx;
+}
+
+.media-placeholder-text {
+  font-size: 28rpx;
+  color: #999999;
+}
+
+.media-counter {
+  position: absolute;
+  right: 24rpx;
+  bottom: 24rpx;
+  padding: 8rpx 16rpx;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 20rpx;
+  color: #ffffff;
+  font-size: 24rpx;
+}
+
+/* ==================== 卡片内容区域 ==================== */
+
+.card-content {
+  padding: 32rpx;
+}
+
+/* 类型标签 */
+.type-tag {
+  display: inline-block;
+  padding: 8rpx 20rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  border-radius: 8rpx;
+  margin-bottom: 20rpx;
+}
+
+/* 标题 */
+.card-title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+  line-height: 1.4;
+  margin-bottom: 24rpx;
+}
+
+/* ==================== 创建者信息 ==================== */
+
+.creator-section {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  margin-bottom: 24rpx;
+}
+
+.creator-info {
+  flex: 1;
+  margin-left: 20rpx;
+}
+
+.creator-name {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-bottom: 4rpx;
+}
+
+.created-time {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.follow-btn {
+  padding: 12rpx 32rpx;
+  background-color: #1890ff;
+  color: #ffffff;
+  font-size: 26rpx;
+  font-weight: 500;
+  border-radius: 32rpx;
+  border: none;
+  line-height: 1.5;
+}
+
+.follow-btn--following {
+  background-color: #f5f5f5;
+  color: #666666;
+}
+
+/* ==================== 描述区域 ==================== */
+
+.description-section {
+  margin-bottom: 24rpx;
+}
+
+.card-description {
+  font-size: 30rpx;
+  color: #333333;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ==================== 位置信息 ==================== */
+
+.location-section {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 24rpx;
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+  margin-bottom: 24rpx;
+}
+
+.location-icon {
+  font-size: 32rpx;
+  margin-right: 12rpx;
+}
+
+.location-name {
+  flex: 1;
+  font-size: 28rpx;
+  color: #666666;
+}
+
+.location-arrow {
+  font-size: 32rpx;
+  color: #cccccc;
+}
+
+/* ==================== 标签区域 ==================== */
+
+.tags-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 10rpx 20rpx;
+  border-radius: 24rpx;
+  font-size: 26rpx;
+}
+
+.tag-icon {
+  margin-right: 8rpx;
+  font-size: 24rpx;
+}
+
+.tag-interest {
+  background-color: rgba(24, 144, 255, 0.1);
+  color: #1890ff;
+}
+
+.tag-emotion {
+  background-color: rgba(250, 173, 20, 0.1);
+  color: #faad14;
+}
+
+/* ==================== 互动统计 ==================== */
+
+.stats-section {
+  display: flex;
+  justify-content: space-around;
+  padding: 24rpx 0;
+  margin-bottom: 24rpx;
+  background-color: #fafafa;
+  border-radius: 12rpx;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-icon {
+  font-size: 36rpx;
+  margin-bottom: 8rpx;
+}
+
+.stat-value {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 4rpx;
+}
+
+.stat-label {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+/* ==================== 分割线 ==================== */
+
+.divider {
+  height: 1rpx;
+  background-color: #f0f0f0;
+  margin: 24rpx 0;
+}
+
+/* ==================== 评论区域 ==================== */
+
+.comments-section {
+  margin-top: 24rpx;
+}
+
+/* ==================== 底部操作栏 ==================== */
+
+.action-bar-placeholder {
+  height: 120rpx;
+}
+
+.action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 32rpx;
+  background-color: #ffffff;
+  border-top: 1rpx solid #f0f0f0;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+
+.action-left {
+  display: flex;
+  align-items: center;
+  gap: 32rpx;
+}
+
+.action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  line-height: 1;
+  transition: transform 0.15s ease;
+}
+
+.action-item:active {
+  transform: scale(0.9);
+}
+
+.action-item--active .action-count {
+  color: #ff4d4f;
+}
+
+.action-item::after {
+  display: none;
+}
+
+.action-share {
+  font-size: inherit;
+}
+
+.action-icon {
+  font-size: 40rpx;
+  margin-bottom: 4rpx;
+}
+
+.action-count {
+  font-size: 22rpx;
+  color: #666666;
+}
+
+.action-right {
+  display: flex;
+  align-items: center;
+}
+
+.exchange-btn {
+  padding: 16rpx 32rpx;
+  background: linear-gradient(135deg, #faad14 0%, #fa8c16 100%);
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 500;
+  border-radius: 40rpx;
+  border: none;
+  line-height: 1.5;
+  box-shadow: 0 4rpx 12rpx rgba(250, 173, 20, 0.3);
+}
+
+.collected-badge {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 32rpx;
+  background-color: #f6ffed;
+  color: #52c41a;
+  font-size: 28rpx;
+  border-radius: 40rpx;
+}
+
+.collected-icon {
+  margin-right: 8rpx;
+}
+
+/* 待处理交换请求状态 (Requirement 7.4) */
+.pending-badge {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 32rpx;
+  background-color: #fff7e6;
+  color: #fa8c16;
+  font-size: 28rpx;
+  border-radius: 40rpx;
+}
+
+.pending-icon {
+  margin-right: 8rpx;
+}
+
+/* 所有者操作按钮组 */
+.owner-actions {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.edit-btn {
+  padding: 16rpx 32rpx;
+  background-color: #f5f5f5;
+  color: #333333;
+  font-size: 28rpx;
+  font-weight: 500;
+  border-radius: 40rpx;
+  border: none;
+  line-height: 1.5;
+}
+
+.edit-btn:active {
+  background-color: #e8e8e8;
+}
+
+.delete-btn {
+  padding: 16rpx 32rpx;
+  background-color: #fff1f0;
+  color: #ff4d4f;
+  font-size: 28rpx;
+  font-weight: 500;
+  border-radius: 40rpx;
+  border: none;
+  line-height: 1.5;
+}
+
+.delete-btn:active {
+  background-color: #ffccc7;
+}
+
+/* ==================== 安全区域适配 ==================== */
+
+.safe-area-bottom {
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ==================== 交换确认弹窗 (Requirements: 7.1, 7.2) ==================== */
+
+.exchange-dialog-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.exchange-dialog {
+  width: 100%;
+  max-height: 85vh;
+  background-color: #ffffff;
+  border-radius: 32rpx 32rpx 0 0;
+  padding: 32rpx;
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: border-box;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* 弹窗头部 */
+.exchange-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32rpx;
+}
+
+.exchange-dialog-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.exchange-dialog-close {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  color: #999999;
+  background-color: #f5f5f5;
+  border-radius: 50%;
+}
+
+/* 卡片信息 */
+.exchange-card-info {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  background-color: #f8f9fa;
+  border-radius: 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.exchange-card-thumb {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+  background-color: #e8e8e8;
+}
+
+.exchange-card-detail {
+  flex: 1;
+  margin-left: 20rpx;
+  overflow: hidden;
+}
+
+.exchange-card-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-bottom: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.exchange-card-creator {
+  font-size: 26rpx;
+  color: #666666;
+}
+
+/* 价格和余额区域 */
+.exchange-price-section {
+  background-color: #fffbe6;
+  border: 1rpx solid #ffe58f;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.exchange-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.exchange-price-label {
+  font-size: 28rpx;
+  color: #666666;
+}
+
+.exchange-price-value {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #faad14;
+}
+
+.exchange-price-detail {
+  margin-bottom: 16rpx;
+  padding-left: 16rpx;
+}
+
+.exchange-price-detail-item {
+  display: block;
+  font-size: 24rpx;
+  color: #999999;
+  margin-bottom: 4rpx;
+}
+
+.exchange-divider {
+  height: 1rpx;
+  background-color: #ffe58f;
+  margin: 16rpx 0;
+}
+
+.exchange-balance-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.exchange-balance-label {
+  font-size: 28rpx;
+  color: #666666;
+}
+
+.exchange-balance-value {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #52c41a;
+}
+
+.exchange-balance-insufficient {
+  color: #ff4d4f;
+}
+
+/* 余额不足提示 */
+.exchange-insufficient-tip {
+  display: flex;
+  align-items: center;
+  margin-top: 16rpx;
+  padding: 16rpx;
+  background-color: #fff1f0;
+  border-radius: 8rpx;
+}
+
+.exchange-insufficient-icon {
+  font-size: 28rpx;
+  margin-right: 8rpx;
+}
+
+.exchange-insufficient-text {
+  font-size: 26rpx;
+  color: #ff4d4f;
+}
+
+/* 交换后余额 */
+.exchange-after-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx dashed #ffe58f;
+}
+
+.exchange-after-label {
+  font-size: 26rpx;
+  color: #999999;
+}
+
+.exchange-after-value {
+  font-size: 28rpx;
+  color: #666666;
+}
+
+/* 留言输入区域 */
+.exchange-message-section {
+  margin-bottom: 32rpx;
+}
+
+.exchange-message-label {
+  display: block;
+  font-size: 28rpx;
+  color: #666666;
+  margin-bottom: 12rpx;
+}
+
+.exchange-message-input {
+  width: 100%;
+  height: 160rpx;
+  padding: 20rpx;
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  color: #333333;
+  box-sizing: border-box;
+}
+
+/* 操作按钮 */
+.exchange-dialog-actions {
+  display: flex;
+  gap: 24rpx;
+}
+
+.exchange-cancel-btn {
+  flex: 1;
+  height: 88rpx;
+  background-color: #f5f5f5;
+  color: #666666;
+  font-size: 30rpx;
+  font-weight: 500;
+  border-radius: 44rpx;
+  border: none;
+  line-height: 88rpx;
+}
+
+.exchange-confirm-btn {
+  flex: 2;
+  height: 88rpx;
+  background: linear-gradient(135deg, #faad14 0%, #fa8c16 100%);
+  color: #ffffff;
+  font-size: 30rpx;
+  font-weight: 500;
+  border-radius: 44rpx;
+  border: none;
+  line-height: 88rpx;
+}
+
+.exchange-confirm-btn--disabled {
+  background: #d9d9d9;
+  color: #999999;
+}
+
+
+/* ==================== 海报生成弹窗 (Requirements: 12.4) ==================== */
+
+.poster-dialog-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.poster-dialog {
+  width: 85%;
+  max-width: 600rpx;
+  max-height: 85vh;
+  background-color: #ffffff;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  box-sizing: border-box;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 弹窗头部 */
+.poster-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.poster-dialog-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.poster-dialog-close {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  color: #999999;
+  background-color: #f5f5f5;
+  border-radius: 50%;
+}
+
+/* 海报预览区域 */
+.poster-preview-area {
+  width: 100%;
+  height: 600rpx;
+  background-color: #f8f9fa;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 24rpx;
+}
+
+/* 加载状态 */
+.poster-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.poster-loading-spinner {
+  width: 64rpx;
+  height: 64rpx;
+  border: 4rpx solid #f0f0f0;
+  border-top-color: #1890ff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.poster-loading-text {
+  margin-top: 20rpx;
+  font-size: 28rpx;
+  color: #666666;
+}
+
+/* 海报图片 */
+.poster-image {
+  width: 100%;
+  height: 100%;
+}
+
+/* 错误状态 */
+.poster-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.poster-error-icon {
+  font-size: 80rpx;
+  margin-bottom: 16rpx;
+}
+
+.poster-error-text {
+  font-size: 28rpx;
+  color: #999999;
+  margin-bottom: 24rpx;
+}
+
+.poster-retry-btn {
+  padding: 16rpx 48rpx;
+  background-color: #1890ff;
+  color: #ffffff;
+  font-size: 28rpx;
+  border-radius: 32rpx;
+  border: none;
+  line-height: 1.5;
+}
+
+/* 操作按钮 */
+.poster-dialog-actions {
+  margin-bottom: 16rpx;
+}
+
+.poster-save-btn {
+  width: 100%;
+  height: 88rpx;
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  color: #ffffff;
+  font-size: 30rpx;
+  font-weight: 500;
+  border-radius: 44rpx;
+  border: none;
+  line-height: 88rpx;
+}
+
+.poster-save-btn[disabled] {
+  background: #d9d9d9;
+  color: #999999;
+}
+
+/* 提示文字 */
+.poster-tip {
+  text-align: center;
+}
+
+.poster-tip text {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+/* 隐藏的 Canvas */
+.poster-canvas {
+  position: fixed;
+  left: -9999px;
+  top: -9999px;
+}

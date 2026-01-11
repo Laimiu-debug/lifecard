@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "用户主页",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "usingComponents": {
+    "card-item": "/components/card-item/card-item",
+    "empty-state": "/components/empty-state/empty-state"
+  }
+}

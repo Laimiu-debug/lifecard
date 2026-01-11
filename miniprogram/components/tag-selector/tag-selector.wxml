@@ -1,0 +1,85 @@
+<!--
+  标签选择器组件
+  支持多选和数量限制
+  Requirements: 3.6
+-->
+<view class="tag-selector {{disabled ? 'tag-selector--disabled' : ''}}">
+  <!-- 已选标签展示 -->
+  <view wx:if="{{selectedTags.length > 0}}" class="tag-selector__selected">
+    <view class="tag-selector__selected-header">
+      <text class="tag-selector__label">已选择 ({{selectedTags.length}}/{{maxCount}})</text>
+    </view>
+    <view class="tag-selector__selected-list">
+      <view 
+        wx:for="{{selectedTags}}" 
+        wx:key="*this" 
+        class="tag-selector__selected-item"
+        data-tag="{{item}}"
+        bind:tap="onRemoveTag"
+      >
+        <text class="tag-selector__selected-text">{{item}}</text>
+        <van-icon wx:if="{{!disabled}}" name="cross" size="24rpx" color="#1890ff" />
+      </view>
+    </view>
+  </view>
+
+  <!-- 可选标签列表 -->
+  <view class="tag-selector__options">
+    <view class="tag-selector__options-header">
+      <text class="tag-selector__label">{{tagType === 'emotion' ? '情绪标签' : '兴趣标签'}}</text>
+    </view>
+    <view class="tag-selector__options-list">
+      <view 
+        wx:for="{{tags}}" 
+        wx:key="*this" 
+        class="tag-selector__option {{selectedTags.indexOf(item) > -1 ? 'tag-selector__option--selected' : ''}}"
+        data-tag="{{item}}"
+        bind:tap="onToggleTag"
+      >
+        <text>{{item}}</text>
+        <van-icon 
+          wx:if="{{selectedTags.indexOf(item) > -1}}" 
+          name="success" 
+          size="24rpx" 
+          color="#1890ff" 
+        />
+      </view>
+
+      <!-- 自定义标签按钮 -->
+      <view 
+        wx:if="{{allowCustom && !showCustomInput}}" 
+        class="tag-selector__option tag-selector__option--add"
+        bind:tap="onShowCustomInput"
+      >
+        <van-icon name="plus" size="24rpx" color="#999" />
+        <text>自定义</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 自定义标签输入框 -->
+  <view wx:if="{{showCustomInput}}" class="tag-selector__custom">
+    <input 
+      class="tag-selector__custom-input"
+      placeholder="输入自定义标签"
+      value="{{customInput}}"
+      maxlength="{{customMaxLength}}"
+      focus="{{true}}"
+      bindinput="onCustomInput"
+      bindconfirm="onAddCustomTag"
+    />
+    <view class="tag-selector__custom-actions">
+      <view class="tag-selector__custom-btn tag-selector__custom-btn--cancel" bind:tap="onHideCustomInput">
+        取消
+      </view>
+      <view class="tag-selector__custom-btn tag-selector__custom-btn--confirm" bind:tap="onAddCustomTag">
+        添加
+      </view>
+    </view>
+  </view>
+
+  <!-- 提示信息 -->
+  <view wx:if="{{selectedTags.length >= maxCount}}" class="tag-selector__tip">
+    <text class="text-warning">已达到最大选择数量</text>
+  </view>
+</view>

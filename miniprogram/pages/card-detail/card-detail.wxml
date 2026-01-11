@@ -1,0 +1,399 @@
+<!--
+  卡片详情页
+  显示媒体轮播、卡片信息、标签、评论等
+  Requirements: 6.1, 7.1, 7.2, 12.1, 12.2, 12.3
+-->
+<view class="page-container">
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 错误状态 -->
+  <view wx:elif="{{errorMessage}}" class="error-container">
+    <empty-state
+      type="error"
+      title="加载失败"
+      description="{{errorMessage}}"
+      actionText="重试"
+      bind:action="onRetry"
+    />
+  </view>
+
+  <!-- 卡片内容 -->
+  <block wx:elif="{{card}}">
+    <!-- 媒体轮播区域 -->
+    <view class="media-section">
+      <swiper 
+        wx:if="{{card.media.length > 0}}"
+        class="media-swiper" 
+        indicator-dots="{{card.media.length > 1}}"
+        indicator-color="rgba(255,255,255,0.5)"
+        indicator-active-color="#ffffff"
+        circular="{{card.media.length > 1}}"
+        bindchange="onSwiperChange"
+      >
+        <swiper-item wx:for="{{card.media}}" wx:key="id">
+          <!-- 图片 -->
+          <image 
+            wx:if="{{item.media_type === 'image'}}"
+            src="{{item.url}}" 
+            mode="aspectFill" 
+            class="media-image"
+            bindtap="onPreviewImage"
+            data-url="{{item.url}}"
+            lazy-load
+          />
+          <!-- 视频 -->
+          <video
+            wx:else
+            id="card-video"
+            class="media-video"
+            src="{{item.url}}"
+            poster="{{item.thumbnail_url}}"
+            controls
+            show-center-play-btn
+            object-fit="cover"
+            data-url="{{item.url}}"
+            bindtap="onPreviewVideo"
+          />
+        </swiper-item>
+      </swiper>
+      
+      <!-- 无媒体占位 -->
+      <view wx:else class="media-placeholder">
+        <text class="media-placeholder-icon">📷</text>
+        <text class="media-placeholder-text">暂无图片</text>
+      </view>
+
+      <!-- 媒体计数指示器 -->
+      <view wx:if="{{card.media.length > 1}}" class="media-counter">
+        <text>{{currentMediaIndex + 1}}/{{card.media.length}}</text>
+      </view>
+    </view>
+
+    <!-- 卡片信息区域 -->
+    <view class="card-content">
+      <!-- 类型标签 -->
+      <view class="type-tag" style="background-color: {{cardTypeColor}}20; color: {{cardTypeColor}};">
+        {{cardTypeLabel}}
+      </view>
+
+      <!-- 标题 -->
+      <text class="card-title">{{card.title}}</text>
+
+      <!-- 创建者信息 -->
+      <view class="creator-section" bindtap="onCreatorTap">
+        <user-avatar 
+          src="{{card.creator.avatar_url}}" 
+          size="80"
+          border="{{true}}"
+        />
+        <view class="creator-info">
+          <text class="creator-name">{{card.creator.nickname || '未知用户'}}</text>
+          <text class="created-time">{{createdTimeText}}</text>
+        </view>
+        <button 
+          wx:if="{{!isOwner}}" 
+          class="follow-btn {{isFollowing ? 'follow-btn--following' : ''}}"
+          catchtap="onFollow"
+        >
+          {{isFollowing ? '已关注' : '+ 关注'}}
+        </button>
+      </view>
+
+      <!-- 描述 -->
+      <view class="description-section">
+        <text class="card-description">{{card.description}}</text>
+      </view>
+
+      <!-- 位置信息 -->
+      <view wx:if="{{card.location}}" class="location-section" bindtap="onLocationTap">
+        <text class="location-icon">📍</text>
+        <text class="location-name">{{card.location.name}}</text>
+        <text class="location-arrow">›</text>
+      </view>
+
+      <!-- 标签区域 -->
+      <view wx:if="{{card.interest_tags.length > 0 || card.emotion_tags.length > 0}}" class="tags-section">
+        <!-- 兴趣标签 -->
+        <view 
+          wx:for="{{card.interest_tags}}" 
+          wx:key="*this" 
+          class="tag tag-interest"
+          data-tag="{{item}}"
+          data-type="interest"
+          bindtap="onTagTap"
+        >
+          <text class="tag-icon">🏷️</text>
+          <text>{{item}}</text>
+        </view>
+        <!-- 情绪标签 -->
+        <view 
+          wx:for="{{card.emotion_tags}}" 
+          wx:key="*this" 
+          class="tag tag-emotion"
+          data-tag="{{item}}"
+          data-type="emotion"
+          bindtap="onTagTap"
+        >
+          <text class="tag-icon">😊</text>
+          <text>{{item}}</text>
+        </view>
+      </view>
+
+      <!-- 互动统计 -->
+      <view class="stats-section">
+        <view class="stat-item">
+          <text class="stat-icon">❤️</text>
+          <text class="stat-value">{{likeCountText}}</text>
+          <text class="stat-label">点赞</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-icon">💬</text>
+          <text class="stat-value">{{commentCountText}}</text>
+          <text class="stat-label">评论</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-icon">🔄</text>
+          <text class="stat-value">{{exchangeCountText}}</text>
+          <text class="stat-label">交换</text>
+        </view>
+      </view>
+
+      <!-- 分割线 -->
+      <view class="divider"></view>
+
+      <!-- 评论区域 -->
+      <view class="comments-section">
+        <comment-list
+          cardId="{{cardId}}"
+          currentUserId="{{currentUserId}}"
+          showInput="{{true}}"
+          placeholder="写下你的评论..."
+          bind:load="onCommentsLoad"
+          bind:submit="onCommentSubmit"
+          bind:tapuser="onTapCommentUser"
+        />
+      </view>
+    </view>
+
+    <!-- 底部操作栏 - 占位 -->
+    <view class="action-bar-placeholder"></view>
+
+    <!-- 底部操作栏 -->
+    <view class="action-bar safe-area-bottom">
+      <!-- 左侧互动按钮 -->
+      <view class="action-left">
+        <!-- 点赞按钮 -->
+        <view class="action-item {{card.is_liked ? 'action-item--active' : ''}}" data-action="like" bindtap="onLike">
+          <text class="action-icon">{{card.is_liked ? '❤️' : '🤍'}}</text>
+          <text class="action-count">{{likeCountText}}</text>
+        </view>
+        <!-- 评论按钮 -->
+        <view class="action-item" data-action="comment">
+          <text class="action-icon">💬</text>
+          <text class="action-count">{{commentCountText}}</text>
+        </view>
+        <!-- 分享按钮 (Requirements: 12.1, 12.2, 12.3) -->
+        <button class="action-item action-share" open-type="share">
+          <text class="action-icon">📤</text>
+          <text class="action-count">分享</text>
+        </button>
+        <!-- 海报按钮 (Requirements: 12.4) -->
+        <view class="action-item" bindtap="onShowPoster">
+          <text class="action-icon">🖼️</text>
+          <text class="action-count">海报</text>
+        </view>
+      </view>
+      
+      <!-- 右侧操作按钮 - 根据所有权显示不同按钮 -->
+      <!-- Requirements: 6.6, 6.7, 7.3, 7.4 -->
+      <view class="action-right">
+        <!-- 非所有者：显示交换按钮和价格 (Requirement 6.6) -->
+        <block wx:if="{{!isOwner}}">
+          <!-- 已收藏状态 -->
+          <view wx:if="{{card.is_collected}}" class="collected-badge">
+            <text class="collected-icon">✅</text>
+            <text>已收藏</text>
+          </view>
+          <!-- 待处理交换请求状态 (Requirement 7.4) -->
+          <view wx:elif="{{hasPendingExchange}}" class="pending-badge">
+            <text class="pending-icon">⏳</text>
+            <text>等待对方确认</text>
+          </view>
+          <!-- 可交换状态 -->
+          <button 
+            wx:else
+            class="exchange-btn"
+            data-action="exchange"
+            bindtap="onExchange"
+          >
+            🔄 {{card.exchange_price}} 金币交换
+          </button>
+        </block>
+        
+        <!-- 所有者：显示编辑和删除按钮 (Requirement 6.7) -->
+        <block wx:else>
+          <view class="owner-actions">
+            <button class="edit-btn" data-action="edit" bindtap="onEdit">
+              ✏️ 编辑
+            </button>
+            <button class="delete-btn" data-action="delete" bindtap="onDelete">
+              🗑️ 删除
+            </button>
+          </view>
+        </block>
+      </view>
+    </view>
+  </block>
+
+  <!-- 交换确认弹窗 (Requirements: 7.1, 7.2) -->
+  <view wx:if="{{showExchangeDialog}}" class="exchange-dialog-mask" catchtap="onCloseExchangeDialog">
+    <view class="exchange-dialog" catchtap="">
+      <!-- 弹窗标题 -->
+      <view class="exchange-dialog-header">
+        <text class="exchange-dialog-title">确认交换</text>
+        <view class="exchange-dialog-close" bindtap="onCloseExchangeDialog">✕</view>
+      </view>
+
+      <!-- 卡片信息 -->
+      <view class="exchange-card-info">
+        <image 
+          class="exchange-card-thumb" 
+          src="{{card.media[0].thumbnail_url || card.media[0].url || '/assets/images/card-placeholder.png'}}" 
+          mode="aspectFill"
+        />
+        <view class="exchange-card-detail">
+          <text class="exchange-card-title">{{card.title}}</text>
+          <text class="exchange-card-creator">创建者: {{card.creator.nickname || '未知用户'}}</text>
+        </view>
+      </view>
+
+      <!-- 价格和余额信息 (Requirement 7.1) -->
+      <view class="exchange-price-section">
+        <!-- 交换价格 -->
+        <view class="exchange-price-row">
+          <text class="exchange-price-label">交换价格</text>
+          <text class="exchange-price-value">{{exchangePriceInfo.total_price || card.exchange_price}} 金币</text>
+        </view>
+        
+        <!-- 价格明细（如果有加成） -->
+        <block wx:if="{{exchangePriceInfo && exchangePriceInfo.popularity_bonus > 0}}">
+          <view class="exchange-price-detail">
+            <text class="exchange-price-detail-item">基础价格: {{exchangePriceInfo.base_price}} 金币</text>
+            <text class="exchange-price-detail-item">热度加成: +{{exchangePriceInfo.popularity_bonus}} 金币</text>
+          </view>
+        </block>
+
+        <!-- 分割线 -->
+        <view class="exchange-divider"></view>
+
+        <!-- 当前余额 -->
+        <view class="exchange-balance-row">
+          <text class="exchange-balance-label">当前余额</text>
+          <text class="exchange-balance-value {{hasEnoughBalance ? '' : 'exchange-balance-insufficient'}}">
+            {{userCoinBalance}} 金币
+          </text>
+        </view>
+
+        <!-- 余额不足提示 (Requirement 7.2) -->
+        <view wx:if="{{!hasEnoughBalance}}" class="exchange-insufficient-tip">
+          <text class="exchange-insufficient-icon">⚠️</text>
+          <text class="exchange-insufficient-text">余额不足，无法完成交换</text>
+        </view>
+
+        <!-- 交换后余额 -->
+        <view wx:if="{{hasEnoughBalance}}" class="exchange-after-row">
+          <text class="exchange-after-label">交换后余额</text>
+          <text class="exchange-after-value">{{userCoinBalance - (exchangePriceInfo.total_price || card.exchange_price)}} 金币</text>
+        </view>
+      </view>
+
+      <!-- 留言输入（可选） -->
+      <view class="exchange-message-section">
+        <text class="exchange-message-label">给卡片主人留言（可选）</text>
+        <textarea 
+          class="exchange-message-input"
+          placeholder="写下你想说的话..."
+          maxlength="200"
+          value="{{exchangeMessage}}"
+          bindinput="onExchangeMessageInput"
+        />
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="exchange-dialog-actions">
+        <button class="exchange-cancel-btn" bindtap="onCloseExchangeDialog">取消</button>
+        <button 
+          class="exchange-confirm-btn {{!hasEnoughBalance ? 'exchange-confirm-btn--disabled' : ''}}"
+          disabled="{{!hasEnoughBalance || exchangeLoading}}"
+          loading="{{exchangeLoading}}"
+          bindtap="onConfirmExchange"
+        >
+          {{exchangeLoading ? '处理中...' : (hasEnoughBalance ? '确认交换' : '余额不足')}}
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 海报生成弹窗 (Requirements: 12.4) -->
+  <view wx:if="{{showPosterDialog}}" class="poster-dialog-mask" catchtap="onClosePosterDialog">
+    <view class="poster-dialog" catchtap="">
+      <!-- 弹窗标题 -->
+      <view class="poster-dialog-header">
+        <text class="poster-dialog-title">分享海报</text>
+        <view class="poster-dialog-close" bindtap="onClosePosterDialog">✕</view>
+      </view>
+
+      <!-- 海报预览区域 -->
+      <view class="poster-preview-area">
+        <!-- 生成中状态 -->
+        <view wx:if="{{posterGenerating}}" class="poster-loading">
+          <view class="poster-loading-spinner"></view>
+          <text class="poster-loading-text">正在生成海报...</text>
+        </view>
+        
+        <!-- 海报图片 -->
+        <image 
+          wx:elif="{{posterImagePath}}"
+          class="poster-image"
+          src="{{posterImagePath}}"
+          mode="aspectFit"
+          bindtap="onPreviewPoster"
+        />
+        
+        <!-- 生成失败占位 -->
+        <view wx:else class="poster-error">
+          <text class="poster-error-icon">😕</text>
+          <text class="poster-error-text">海报生成失败</text>
+          <button class="poster-retry-btn" bindtap="generateCardPoster">重试</button>
+        </view>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="poster-dialog-actions">
+        <button 
+          class="poster-save-btn"
+          disabled="{{posterGenerating || !posterImagePath}}"
+          bindtap="onSavePoster"
+        >
+          保存到相册
+        </button>
+      </view>
+
+      <!-- 提示文字 -->
+      <view class="poster-tip">
+        <text>保存海报后可分享到朋友圈</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 隐藏的 Canvas 用于生成海报 -->
+  <canvas 
+    canvas-id="posterCanvas" 
+    class="poster-canvas"
+    style="width: 750px; height: 1200px; position: fixed; left: -9999px; top: -9999px;"
+  />
+</view>

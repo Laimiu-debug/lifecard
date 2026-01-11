@@ -1,0 +1,54 @@
+<!--
+  位置选择器组件
+  集成微信位置 API
+  Requirements: 3.5
+-->
+<view class="location-picker {{disabled ? 'location-picker--disabled' : ''}}">
+  <!-- 已选位置显示 -->
+  <view wx:if="{{selectedLocation}}" class="location-picker__selected" bind:tap="onChooseLocation">
+    <view class="location-picker__icon">
+      <van-icon name="location-o" size="40rpx" color="#1890ff" />
+    </view>
+    <view class="location-picker__info">
+      <text class="location-picker__name">{{selectedLocation.name}}</text>
+      <text class="location-picker__coords">
+        {{selectedLocation.latitude.toFixed(4)}}, {{selectedLocation.longitude.toFixed(4)}}
+      </text>
+    </view>
+    <!-- 清除按钮 -->
+    <view 
+      wx:if="{{showClear && !disabled}}" 
+      class="location-picker__clear" 
+      catch:tap="onClearLocation"
+    >
+      <van-icon name="clear" size="36rpx" color="#999" />
+    </view>
+  </view>
+
+  <!-- 未选位置时的占位 -->
+  <view wx:else class="location-picker__placeholder" bind:tap="onChooseLocation">
+    <view class="location-picker__icon">
+      <van-icon name="location-o" size="40rpx" color="#999" />
+    </view>
+    <text class="location-picker__placeholder-text">{{placeholder}}</text>
+    <view wx:if="{{loading}}" class="location-picker__loading">
+      <van-loading size="32rpx" color="#1890ff" />
+    </view>
+    <van-icon wx:else name="arrow" size="32rpx" color="#999" />
+  </view>
+
+  <!-- 快捷操作 -->
+  <view wx:if="{{showCurrentLocation && !selectedLocation && !disabled}}" class="location-picker__actions">
+    <view class="location-picker__action" bind:tap="onGetCurrentLocation">
+      <van-icon name="aim" size="32rpx" color="#1890ff" />
+      <text class="location-picker__action-text">使用当前位置</text>
+      <van-loading wx:if="{{loading}}" size="24rpx" color="#1890ff" />
+    </view>
+  </view>
+
+  <!-- 错误提示 -->
+  <view wx:if="{{errorMessage}}" class="location-picker__error">
+    <van-icon name="warning-o" size="28rpx" color="#ff4d4f" />
+    <text class="location-picker__error-text">{{errorMessage}}</text>
+  </view>
+</view>

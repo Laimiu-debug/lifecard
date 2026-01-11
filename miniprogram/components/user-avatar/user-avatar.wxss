@@ -1,0 +1,27 @@
+/**
+ * 用户头像组件样式
+ * Requirements: 2.1, 6.2
+ */
+
+.user-avatar {
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background-color: #f0f0f0;
+  box-sizing: border-box;
+}
+
+.user-avatar--clickable {
+  cursor: pointer;
+}
+
+.user-avatar--clickable:active {
+  opacity: 0.8;
+}
+
+.user-avatar__image {
+  width: 100%;
+  height: 100%;
+  display: block;
+}

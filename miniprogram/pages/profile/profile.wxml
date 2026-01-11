@@ -1,0 +1,258 @@
+<!--pages/profile/profile.wxml-->
+<!--
+  个人中心页面
+  显示用户资料、统计数据、金币余额
+  Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 11.1
+-->
+<view class="page-container">
+  <!-- 未登录状态 -->
+  <view class="login-prompt" wx:if="{{!isLoggedIn}}">
+    <image src="/assets/images/default-avatar.png" class="avatar-placeholder" mode="aspectFill" />
+    <text class="login-text">登录后查看个人信息</text>
+    <button class="btn btn-primary login-btn" bindtap="onLogin">微信登录</button>
+  </view>
+
+  <!-- 已登录状态 -->
+  <block wx:else>
+    <!-- 用户信息卡片 -->
+    <view class="profile-card">
+      <view class="profile-header">
+        <image 
+          src="{{profile.avatar_url || '/assets/images/default-avatar.png'}}" 
+          class="avatar-lg"
+          mode="aspectFill"
+        />
+        <view class="profile-info">
+          <text class="nickname">{{profile.nickname || '用户'}}</text>
+          <text class="bio text-ellipsis">{{profile.bio || '这个人很懒，什么都没写'}}</text>
+          <view class="profile-meta" wx:if="{{profile.location}}">
+            <text class="meta-icon">📍</text>
+            <text class="meta-text">{{profile.location}}</text>
+          </view>
+        </view>
+        <view class="edit-btn" bindtap="onEditProfile">
+          <text class="edit-icon">✏️</text>
+          <text>编辑</text>
+        </view>
+      </view>
+
+      <!-- 统计数据 -->
+      <view class="stats-row">
+        <view class="stat-item" bindtap="onViewFollowing">
+          <text class="stat-value">{{stats.followingCount}}</text>
+          <text class="stat-label">关注</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item" bindtap="onViewFollowers">
+          <text class="stat-value">{{stats.followerCount}}</text>
+          <text class="stat-label">粉丝</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item" bindtap="onViewMyCards">
+          <text class="stat-value">{{stats.cardCount}}</text>
+          <text class="stat-label">卡片</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 金币余额卡片 -->
+    <view class="coin-card" bindtap="onViewTransactions">
+      <view class="coin-left">
+        <view class="coin-icon-wrapper">
+          <text class="coin-icon">🪙</text>
+        </view>
+        <view class="coin-info">
+          <text class="coin-label">金币余额</text>
+          <text class="coin-hint">点击查看交易记录</text>
+        </view>
+      </view>
+      <view class="coin-right">
+        <text class="coin-amount">{{coinBalance}}</text>
+        <text class="arrow-icon">›</text>
+      </view>
+    </view>
+
+    <!-- 功能菜单 -->
+    <view class="menu-section">
+      <view class="section-title">我的服务</view>
+      <view class="menu-grid">
+        <view class="menu-grid-item" bindtap="onViewMyCards">
+          <view class="menu-icon-wrapper">
+            <text class="menu-icon">📁</text>
+          </view>
+          <text class="menu-text">我的卡片</text>
+        </view>
+        <view class="menu-grid-item" bindtap="onViewExchanges">
+          <view class="menu-icon-wrapper">
+            <text class="menu-icon">🔄</text>
+          </view>
+          <text class="menu-text">交换管理</text>
+        </view>
+        <view class="menu-grid-item" bindtap="onViewNotifications">
+          <view class="menu-icon-wrapper notification-icon-wrapper">
+            <text class="menu-icon">🔔</text>
+            <!-- 未读通知徽章 Requirements: 10.1 -->
+            <view class="notification-badge" wx:if="{{unreadCount > 0}}">
+              <text>{{unreadCount > 99 ? '99+' : unreadCount}}</text>
+            </view>
+          </view>
+          <text class="menu-text">消息通知</text>
+        </view>
+        <view class="menu-grid-item" bindtap="onViewFollowing">
+          <view class="menu-icon-wrapper">
+            <text class="menu-icon">👥</text>
+          </view>
+          <text class="menu-text">我的关注</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 设置菜单 -->
+    <view class="menu-list">
+      <view class="menu-item" bindtap="onSettings">
+        <text class="menu-item-icon">⚙️</text>
+        <text class="menu-item-text">设置</text>
+        <text class="menu-item-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="onAbout">
+        <text class="menu-item-icon">ℹ️</text>
+        <text class="menu-item-text">关于我们</text>
+        <text class="menu-item-arrow">›</text>
+      </view>
+      <view class="menu-item logout-item" bindtap="onLogout">
+        <text class="menu-item-icon">🚪</text>
+        <text class="menu-item-text text-danger">退出登录</text>
+        <text class="menu-item-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- 版本信息 -->
+    <view class="version-info">
+      <text>Life Card v1.0.0</text>
+    </view>
+  </block>
+
+  <!-- 编辑资料弹窗 -->
+  <view class="modal-overlay" wx:if="{{showEditModal}}" bindtap="onCloseEditModal">
+    <view class="modal-content" catchtap="">
+      <!-- 弹窗头部 -->
+      <view class="modal-header">
+        <text class="modal-title">编辑资料</text>
+        <view class="modal-close" bindtap="onCloseEditModal">✕</view>
+      </view>
+
+      <!-- 弹窗内容 -->
+      <scroll-view class="modal-body" scroll-y>
+        <!-- 头像编辑 -->
+        <view class="form-item avatar-form-item">
+          <view class="form-label">头像</view>
+          <view class="avatar-edit-wrapper" bindtap="onChangeAvatar">
+            <image 
+              src="{{editForm.avatar_url || '/assets/images/default-avatar.png'}}" 
+              class="avatar-edit"
+              mode="aspectFill"
+            />
+            <view class="avatar-edit-overlay">
+              <text class="avatar-edit-icon">📷</text>
+            </view>
+            <view class="avatar-loading" wx:if="{{uploadingAvatar}}">
+              <view class="loading-spinner-small"></view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 昵称 -->
+        <view class="form-item">
+          <view class="form-label">
+            <text>昵称</text>
+            <text class="required">*</text>
+          </view>
+          <input 
+            class="form-input {{formErrors.nickname ? 'input-error' : ''}}"
+            type="text"
+            placeholder="请输入昵称"
+            value="{{editForm.nickname}}"
+            maxlength="50"
+            bindinput="onNicknameInput"
+          />
+          <view class="form-error" wx:if="{{formErrors.nickname}}">
+            {{formErrors.nickname}}
+          </view>
+          <view class="form-hint">
+            <text>{{editForm.nickname.length}}/50</text>
+          </view>
+        </view>
+
+        <!-- 简介 -->
+        <view class="form-item">
+          <view class="form-label">简介</view>
+          <textarea 
+            class="form-textarea {{formErrors.bio ? 'input-error' : ''}}"
+            placeholder="介绍一下自己吧"
+            value="{{editForm.bio}}"
+            maxlength="500"
+            bindinput="onBioInput"
+            auto-height
+          />
+          <view class="form-error" wx:if="{{formErrors.bio}}">
+            {{formErrors.bio}}
+          </view>
+          <view class="form-hint">
+            <text>{{editForm.bio.length}}/500</text>
+          </view>
+        </view>
+
+        <!-- 年龄范围 -->
+        <view class="form-item">
+          <view class="form-label">年龄范围</view>
+          <picker 
+            mode="selector" 
+            range="{{ageRangeOptions}}"
+            value="{{ageRangeIndex}}"
+            bindchange="onAgeRangeChange"
+          >
+            <view class="form-picker">
+              <text class="{{editForm.age_range ? '' : 'placeholder'}}">
+                {{editForm.age_range || '请选择年龄范围'}}
+              </text>
+              <text class="picker-arrow">›</text>
+            </view>
+          </picker>
+        </view>
+
+        <!-- 所在地 -->
+        <view class="form-item">
+          <view class="form-label">所在地</view>
+          <input 
+            class="form-input"
+            type="text"
+            placeholder="请输入所在地"
+            value="{{editForm.location}}"
+            maxlength="100"
+            bindinput="onLocationInput"
+          />
+        </view>
+      </scroll-view>
+
+      <!-- 弹窗底部 -->
+      <view class="modal-footer">
+        <button 
+          class="btn btn-secondary" 
+          bindtap="onCloseEditModal"
+          disabled="{{submitting}}"
+        >取消</button>
+        <button 
+          class="btn btn-primary" 
+          bindtap="onSubmitProfile"
+          disabled="{{submitting || uploadingAvatar}}"
+          loading="{{submitting}}"
+        >保存</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-overlay" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+  </view>
+</view>

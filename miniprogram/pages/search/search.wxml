@@ -1,0 +1,232 @@
+<!--
+  搜索页面
+  实现搜索框、历史记录、筛选功能
+  Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6
+-->
+<view class="page-container">
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-input-wrap">
+      <van-icon name="search" size="32rpx" color="#999" custom-class="search-icon" />
+      <input 
+        class="search-input" 
+        placeholder="搜索卡片标题、描述..."
+        value="{{keyword}}"
+        bindinput="onKeywordInput"
+        bindconfirm="onSearch"
+        confirm-type="search"
+        focus="{{!searched}}"
+      />
+      <van-icon 
+        wx:if="{{keyword}}" 
+        name="clear" 
+        size="32rpx" 
+        color="#999" 
+        bindtap="onClearKeyword"
+      />
+    </view>
+    <view class="search-actions">
+      <view class="filter-btn {{showFilter ? 'active' : ''}}" bindtap="toggleFilter">
+        <van-icon name="filter-o" size="36rpx" />
+        <view class="filter-badge" wx:if="{{filters.cardType || filters.interestTags.length > 0 || filters.nearbyEnabled}}"></view>
+      </view>
+      <text class="search-btn" bindtap="onSearch">搜索</text>
+    </view>
+  </view>
+
+  <!-- 筛选面板 -->
+  <view class="filter-panel {{showFilter ? 'show' : ''}}">
+    <!-- 卡片类型筛选 -->
+    <!-- Requirements: 5.3 -->
+    <view class="filter-section">
+      <view class="filter-label">卡片类型</view>
+      <picker 
+        mode="selector" 
+        range="{{cardTypeOptions}}" 
+        range-key="label"
+        value="{{cardTypeIndex}}"
+        bindchange="onCardTypeChange"
+      >
+        <view class="filter-picker">
+          <text>{{cardTypeLabel}}</text>
+          <van-icon name="arrow-down" size="24rpx" color="#999" />
+        </view>
+      </picker>
+    </view>
+
+    <!-- 标签筛选 -->
+    <!-- Requirements: 5.4 -->
+    <view class="filter-section">
+      <view class="filter-label">兴趣标签 <text class="filter-hint">(最多5个)</text></view>
+      <view class="tag-list">
+        <view 
+          class="tag-item {{filters.interestTags.includes(item) ? 'selected' : ''}}"
+          wx:for="{{hotTags}}"
+          wx:key="*this"
+          data-tag="{{item}}"
+          bindtap="onTagToggle"
+        >
+          {{item}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 附近搜索 -->
+    <!-- Requirements: 5.5 -->
+    <view class="filter-section">
+      <view class="filter-label">附近搜索</view>
+      <view class="nearby-toggle">
+        <van-switch 
+          checked="{{filters.nearbyEnabled}}" 
+          size="20px"
+          bind:change="onNearbyToggle"
+          loading="{{gettingLocation}}"
+        />
+        <text class="nearby-status">{{filters.nearbyEnabled ? '已开启' : '未开启'}}</text>
+      </view>
+      
+      <view class="location-section" wx:if="{{filters.nearbyEnabled}}">
+        <view class="location-info" bindtap="chooseLocation">
+          <van-icon name="location-o" size="32rpx" color="#1890ff" />
+          <text class="location-name">{{locationName || '点击选择位置'}}</text>
+          <van-icon name="arrow" size="24rpx" color="#999" />
+        </view>
+        
+        <view class="radius-picker">
+          <text class="radius-label">搜索半径：</text>
+          <picker 
+            mode="selector" 
+            range="{{radiusOptions}}" 
+            range-key="label"
+            value="{{radiusIndex}}"
+            bindchange="onRadiusChange"
+          >
+            <view class="radius-value">
+              <text>{{radiusLabel}}</text>
+              <van-icon name="arrow-down" size="24rpx" color="#999" />
+            </view>
+          </picker>
+        </view>
+      </view>
+    </view>
+
+    <!-- 筛选操作按钮 -->
+    <view class="filter-actions">
+      <van-button size="small" bindtap="onResetFilter">重置</van-button>
+      <van-button type="primary" size="small" bindtap="onApplyFilter">应用筛选</van-button>
+    </view>
+  </view>
+
+  <!-- 遮罩层 -->
+  <view class="filter-mask {{showFilter ? 'show' : ''}}" bindtap="toggleFilter"></view>
+
+  <!-- 搜索历史 -->
+  <!-- Requirements: 5.1 -->
+  <view class="history-section" wx:if="{{!searched && searchHistory.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">搜索历史</text>
+      <view class="clear-btn" bindtap="onClearHistory">
+        <van-icon name="delete-o" size="28rpx" color="#999" />
+        <text>清空</text>
+      </view>
+    </view>
+    <view class="history-list">
+      <view 
+        class="history-item" 
+        wx:for="{{searchHistory}}" 
+        wx:key="*this"
+      >
+        <view class="history-content" data-keyword="{{item}}" bindtap="onHistoryTap">
+          <van-icon name="clock-o" size="28rpx" color="#999" />
+          <text class="history-text">{{item}}</text>
+        </view>
+        <van-icon 
+          name="cross" 
+          size="28rpx" 
+          color="#ccc" 
+          data-keyword="{{item}}"
+          catchtap="onDeleteHistoryItem"
+        />
+      </view>
+    </view>
+  </view>
+
+  <!-- 热门标签推荐 -->
+  <view class="hot-tags-section" wx:if="{{!searched}}">
+    <view class="section-header">
+      <text class="section-title">热门标签</text>
+    </view>
+    <view class="hot-tags-list">
+      <view 
+        class="hot-tag-item"
+        wx:for="{{hotTags}}"
+        wx:key="*this"
+        data-tag="{{item}}"
+        bindtap="onTagToggle"
+      >
+        <text class="hot-tag-text"># {{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 搜索结果 -->
+  <!-- Requirements: 5.6 -->
+  <view class="results-section" wx:if="{{searched}}">
+    <!-- 结果统计 -->
+    <view class="results-header" wx:if="{{total > 0}}">
+      <text class="results-count">找到 {{total}} 个结果</text>
+      <!-- 当前筛选条件 -->
+      <view class="active-filters" wx:if="{{filters.cardType || filters.interestTags.length > 0 || filters.nearbyEnabled}}">
+        <view class="active-filter-tag" wx:if="{{filters.cardType}}">
+          {{cardTypeLabel}}
+        </view>
+        <view class="active-filter-tag" wx:for="{{filters.interestTags}}" wx:key="*this">
+          {{item}}
+        </view>
+        <view class="active-filter-tag" wx:if="{{filters.nearbyEnabled}}">
+          附近{{filters.radiusKm}}公里
+        </view>
+      </view>
+    </view>
+
+    <!-- 卡片列表 -->
+    <view class="card-list">
+      <block wx:for="{{results}}" wx:key="id">
+        <card-item 
+          card="{{item}}"
+          showCreator="{{true}}"
+          showStats="{{true}}"
+          bind:tap="onCardTap"
+          bind:tapcreator="onCreatorTap"
+        />
+      </block>
+
+      <!-- 加载更多 -->
+      <view class="loading-more" wx:if="{{loading && results.length > 0}}">
+        <van-loading size="24px" vertical>加载更多...</van-loading>
+      </view>
+
+      <!-- 没有更多 -->
+      <view class="no-more" wx:if="{{!hasMore && results.length > 0 && !loading}}">
+        <van-divider contentPosition="center">没有更多了</van-divider>
+      </view>
+    </view>
+
+    <!-- 初始加载状态 -->
+    <view class="initial-loading" wx:if="{{loading && results.length === 0}}">
+      <van-loading size="24px" vertical>搜索中...</van-loading>
+    </view>
+
+    <!-- 空状态 -->
+    <!-- Requirements: 5.7 -->
+    <view class="empty" wx:if="{{!loading && results.length === 0}}">
+      <empty-state
+        icon="search"
+        title="未找到相关卡片"
+        description="试试其他关键词或调整筛选条件"
+      >
+        <van-button type="primary" size="small" bindtap="onResetFilter">重置筛选</van-button>
+      </empty-state>
+    </view>
+  </view>
+</view>

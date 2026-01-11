@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "创建卡片",
+  "usingComponents": {
+    "tag-selector": "/components/tag-selector/tag-selector",
+    "media-picker": "/components/media-picker/media-picker",
+    "location-picker": "/components/location-picker/location-picker"
+  }
+}

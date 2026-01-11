@@ -1,0 +1,132 @@
+<!--
+  首页 - Feed 卡片流
+  实现 Tab 切换（推荐/热门/随机）
+  实现下拉刷新和上拉加载（无限滚动）
+  集成 cursor 分页
+  Requirements: 4.1, 4.2, 4.3, 4.6
+-->
+<view class="page-container">
+  <!-- 顶部导航 -->
+  <view class="header">
+    <view class="header-left">
+      <text class="logo">Life Card</text>
+    </view>
+    <view class="header-right">
+      <view class="icon-btn" bindtap="onSearchTap">
+        <van-icon name="search" size="44rpx" color="#333" />
+      </view>
+      <view class="icon-btn notification-btn" bindtap="onNotificationTap">
+        <van-badge content="{{unreadCount > 99 ? '99+' : (unreadCount > 0 ? unreadCount : '')}}" max="99">
+          <van-icon name="bell" size="44rpx" color="#333" />
+        </van-badge>
+      </view>
+    </view>
+  </view>
+
+  <!-- Tab 切换 -->
+  <view class="tabs">
+    <view 
+      class="tab-item {{activeTab === 'recommend' ? 'active' : ''}}" 
+      data-tab="recommend"
+      bindtap="onTabChange"
+    >
+      推荐
+    </view>
+    <view 
+      class="tab-item {{activeTab === 'hot' ? 'active' : ''}}" 
+      data-tab="hot"
+      bindtap="onTabChange"
+    >
+      热门
+    </view>
+    <view 
+      class="tab-item {{activeTab === 'random' ? 'active' : ''}}" 
+      data-tab="random"
+      bindtap="onTabChange"
+    >
+      随机
+    </view>
+  </view>
+
+  <!-- 热门时间范围筛选（仅在热门 Tab 显示） -->
+  <view class="time-filter" wx:if="{{activeTab === 'hot'}}">
+    <view 
+      class="time-filter-item {{hotTimeRange === 'day' ? 'active' : ''}}"
+      data-range="day"
+      bindtap="onHotTimeRangeChange"
+    >
+      今日
+    </view>
+    <view 
+      class="time-filter-item {{hotTimeRange === 'week' ? 'active' : ''}}"
+      data-range="week"
+      bindtap="onHotTimeRangeChange"
+    >
+      本周
+    </view>
+    <view 
+      class="time-filter-item {{hotTimeRange === 'month' ? 'active' : ''}}"
+      data-range="month"
+      bindtap="onHotTimeRangeChange"
+    >
+      本月
+    </view>
+  </view>
+
+  <!-- 随机换一批按钮（仅在随机 Tab 显示） -->
+  <view class="random-refresh" wx:if="{{activeTab === 'random' && cards.length > 0}}">
+    <van-button 
+      type="default" 
+      size="small" 
+      icon="replay"
+      bindtap="onRefreshRandom"
+    >
+      换一批
+    </van-button>
+  </view>
+
+  <!-- 卡片列表 -->
+  <view class="card-list">
+    <block wx:for="{{cards}}" wx:key="id">
+      <card-item 
+        card="{{item}}"
+        showCreator="{{true}}"
+        showStats="{{true}}"
+        bind:tap="onCardTap"
+        bind:tapcreator="onCreatorTap"
+      />
+    </block>
+
+    <!-- 上拉加载更多状态 (无限滚动) -->
+    <!-- Requirements: 4.2 - 无限滚动加载 -->
+    <view class="loading-more" wx:if="{{loadingMore && cards.length > 0}}">
+      <van-loading size="24px" vertical>加载更多...</van-loading>
+    </view>
+
+    <!-- 初始加载状态 -->
+    <view class="initial-loading" wx:if="{{loading && cards.length === 0 && !refreshing}}">
+      <van-loading size="24px" vertical>加载中...</van-loading>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty" wx:if="{{!loading && !loadingMore && cards.length === 0}}">
+      <van-empty 
+        image="search" 
+        description="{{activeTab === 'recommend' ? '暂无推荐卡片' : activeTab === 'hot' ? '暂无热门卡片' : '暂无随机卡片'}}"
+      >
+        <van-button type="primary" size="small" bindtap="refreshFeed">刷新试试</van-button>
+      </van-empty>
+    </view>
+
+    <!-- 没有更多数据提示 -->
+    <!-- Requirements: 4.2 - 分页结束提示 -->
+    <view class="no-more" wx:if="{{!hasMore && cards.length > 0 && !loading && !loadingMore}}">
+      <van-divider contentPosition="center">没有更多了</van-divider>
+    </view>
+
+    <!-- 上拉加载提示（有更多数据时显示） -->
+    <view class="load-more-hint" wx:if="{{hasMore && cards.length > 0 && !loading && !loadingMore && activeTab !== 'hot'}}">
+      <text class="hint-text">上拉加载更多</text>
+    </view>
+  </view>
+</view>

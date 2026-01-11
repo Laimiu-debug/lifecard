@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.test.json",
+  "compilerOptions": {
+    "rootDir": "..",
+    "types": ["jest", "node"]
+  },
+  "include": [
+    "./**/*.ts",
+    "../utils/**/*.ts",
+    "../stores/**/*.ts",
+    "../services/**/*.ts",
+    "../types/**/*.ts"
+  ]
+}

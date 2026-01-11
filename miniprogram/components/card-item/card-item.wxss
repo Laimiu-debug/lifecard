@@ -1,0 +1,111 @@
+/**
+ * 卡片列表项组件样式
+ * Requirements: 4.4
+ */
+
+.card-item {
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+/* 缩略图区域 */
+.card-item__thumbnail {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 75%; /* 4:3 比例 */
+  overflow: hidden;
+}
+
+.card-item__thumbnail van-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* 点赞角标 */
+.card-item__liked-badge {
+  position: absolute;
+  top: 16rpx;
+  right: 16rpx;
+  width: 48rpx;
+  height: 48rpx;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 内容区域 */
+.card-item__content {
+  padding: 20rpx 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+/* 标题 */
+.card-item__title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333333;
+  line-height: 1.4;
+  min-height: 78rpx; /* 两行高度 */
+}
+
+/* 底部信息 */
+.card-item__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 创建者信息 */
+.card-item__creator {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  margin-right: 16rpx;
+}
+
+.card-item__avatar {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  margin-right: 12rpx;
+  flex-shrink: 0;
+}
+
+.card-item__creator-name {
+  font-size: 24rpx;
+  color: #666666;
+  flex: 1;
+  min-width: 0;
+}
+
+/* 互动数据 */
+.card-item__stats {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  flex-shrink: 0;
+}
+
+.card-item__stat {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.card-item__stat-text {
+  font-size: 22rpx;
+  color: #999999;
+}

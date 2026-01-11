@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "关注列表",
+  "usingComponents": {
+    "van-tabs": "@vant/weapp/tabs/index",
+    "van-tab": "@vant/weapp/tab/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-loading": "@vant/weapp/loading/index"
+  },
+  "enablePullDownRefresh": true
+}

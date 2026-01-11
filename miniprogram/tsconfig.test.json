@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "types": ["jest", "node", "miniprogram-api-typings"],
+    "skipLibCheck": true,
+    "noImplicitAny": false
+  },
+  "include": [
+    "tests/**/*.ts",
+    "utils/**/*.ts",
+    "stores/**/*.ts",
+    "services/**/*.ts",
+    "types/**/*.ts",
+    "typings/**/*.ts"
+  ]
+}

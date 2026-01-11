@@ -1,0 +1,17 @@
+<!--
+  用户头像组件
+  支持不同尺寸和默认头像
+  Requirements: 2.1, 6.2
+-->
+<view 
+  class="user-avatar {{clickable ? 'user-avatar--clickable' : ''}}"
+  style="{{sizeStyle}}"
+  bind:tap="onTapAvatar"
+>
+  <image
+    class="user-avatar__image"
+    src="{{avatarUrl}}"
+    mode="aspectFill"
+    binderror="onImageError"
+  />
+</view>

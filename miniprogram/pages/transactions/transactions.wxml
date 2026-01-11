@@ -1,0 +1,77 @@
+<!--pages/transactions/transactions.wxml-->
+<!--
+  交易历史页面
+  显示金币交易记录列表
+  Requirements: 11.2, 11.3, 11.4
+-->
+<view class="page-container">
+  <!-- 余额卡片 Requirements: 11.1 -->
+  <view class="balance-card">
+    <view class="balance-header">
+      <text class="balance-label">当前余额</text>
+    </view>
+    <view class="balance-content">
+      <text class="coin-icon">🪙</text>
+      <text class="balance-amount">{{coinBalance}}</text>
+      <text class="balance-unit">金币</text>
+    </view>
+  </view>
+
+  <!-- 交易记录标题 -->
+  <view class="section-header">
+    <text class="section-title">交易记录</text>
+    <text class="section-count" wx:if="{{total > 0}}">共 {{total}} 条</text>
+  </view>
+
+  <!-- 交易记录列表 Requirements: 11.2, 11.3, 11.4 -->
+  <view class="transaction-list" wx:if="{{transactions.length > 0}}">
+    <view 
+      class="transaction-item" 
+      wx:for="{{transactions}}" 
+      wx:key="id"
+    >
+      <!-- 交易图标 -->
+      <view class="transaction-icon {{item.isEarn ? 'earn' : 'spend'}}">
+        <text>{{item.typeIcon}}</text>
+      </view>
+
+      <!-- 交易信息 -->
+      <view class="transaction-info">
+        <view class="transaction-main">
+          <text class="transaction-desc">{{item.description}}</text>
+          <text class="transaction-amount {{item.isEarn ? 'amount-earn' : 'amount-spend'}}">
+            {{item.formattedAmount}}
+          </text>
+        </view>
+        <view class="transaction-meta">
+          <text class="transaction-type">{{item.typeLabel}}</text>
+          <text class="transaction-date">{{item.formattedDate}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-container" wx:if="{{isEmpty && !loading}}">
+    <empty-state
+      icon="📋"
+      title="暂无交易记录"
+      description="创建卡片或交换卡片后，交易记录将显示在这里"
+    />
+  </view>
+
+  <!-- 加载更多 -->
+  <view class="load-more" wx:if="{{transactions.length > 0}}">
+    <view class="loading-indicator" wx:if="{{loading}}">
+      <view class="loading-spinner-small"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+    <text class="no-more-text" wx:elif="{{!hasMore}}">没有更多了</text>
+  </view>
+
+  <!-- 初始加载状态 -->
+  <view class="loading-container" wx:if="{{loading && transactions.length === 0}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+</view>

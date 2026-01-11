@@ -1,0 +1,26 @@
+<!--pages/login/login.wxml-->
+<view class="page-container">
+  <!-- Logo 区域 -->
+  <view class="logo-section">
+    <image src="/assets/images/logo.png" class="logo" mode="aspectFit" />
+    <text class="app-name">Life Card</text>
+    <text class="app-slogan">分享你的人生体验</text>
+  </view>
+
+  <!-- 登录按钮 -->
+  <view class="login-section">
+    <button 
+      class="login-btn" 
+      bindtap="onLogin"
+      loading="{{loading}}"
+      disabled="{{loading}}"
+    >
+      <image src="/assets/icons/wechat.png" class="wechat-icon" />
+      微信一键登录
+    </button>
+
+    <view class="agreement">
+      登录即表示同意 <text class="agreement-link">用户协议</text> 和 <text class="agreement-link">隐私政策</text>
+    </view>
+  </view>
+</view>

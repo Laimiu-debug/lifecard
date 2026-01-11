@@ -1,0 +1,151 @@
+<!--pages/follow-list/follow-list.wxml-->
+<!--
+  粉丝/关注列表页面
+  显示列表和互关状态
+  Requirements: 9.3, 9.4, 9.5
+-->
+<view class="page-container">
+  <!-- Tab 切换 -->
+  <van-tabs 
+    active="{{ activeTab }}" 
+    bind:change="onTabChange"
+    color="#1890ff"
+    title-active-color="#1890ff"
+  >
+    <!-- 粉丝 Tab -->
+    <van-tab name="followers" title="粉丝 {{followersTotal > 0 ? '(' + followersTotal + ')' : ''}}">
+      <view class="list-container">
+        <!-- 粉丝列表 -->
+        <view class="user-list" wx:if="{{followers.length > 0}}">
+          <view 
+            class="user-item" 
+            wx:for="{{followers}}" 
+            wx:key="id"
+          >
+            <!-- 用户信息区域（可点击跳转） -->
+            <view 
+              class="user-info" 
+              data-user-id="{{item.id}}"
+              bindtap="onUserTap"
+            >
+              <image 
+                src="{{item.avatar_url || '/assets/images/default-avatar.png'}}" 
+                class="user-avatar"
+                mode="aspectFill"
+              />
+              <view class="user-detail">
+                <view class="user-name-row">
+                  <text class="user-name">{{item.nickname}}</text>
+                  <!-- 互关标识 - Requirements: 9.5 -->
+                  <text class="mutual-badge" wx:if="{{item.is_mutual_follow}}">互相关注</text>
+                </view>
+                <text class="user-bio" wx:if="{{item.bio}}">{{item.bio}}</text>
+                <text class="user-bio placeholder" wx:else>暂无简介</text>
+                <text class="user-card-count">{{item.card_count || 0}} 张卡片</text>
+              </view>
+            </view>
+            
+            <!-- 关注按钮 -->
+            <button 
+              class="follow-btn {{item.is_following ? 'following' : ''}}"
+              data-user-id="{{item.id}}"
+              data-is-following="{{item.is_following}}"
+              bindtap="onToggleFollow"
+              disabled="{{operatingUserId === item.id}}"
+            >
+              <text wx:if="{{operatingUserId === item.id}}">...</text>
+              <text wx:elif="{{item.is_mutual_follow}}">互相关注</text>
+              <text wx:elif="{{item.is_following}}">已关注</text>
+              <text wx:else>+ 关注</text>
+            </button>
+          </view>
+        </view>
+
+        <!-- 空状态 -->
+        <view class="empty-state" wx:elif="{{!loadingFollowers}}">
+          <text class="empty-icon">👥</text>
+          <text class="empty-text">暂无粉丝</text>
+          <text class="empty-hint">分享精彩卡片，吸引更多关注</text>
+        </view>
+
+        <!-- 加载更多 -->
+        <view class="load-more" wx:if="{{loadingFollowers}}">
+          <van-loading size="24px" color="#1890ff">加载中...</van-loading>
+        </view>
+
+        <!-- 没有更多 -->
+        <view class="no-more" wx:elif="{{followers.length > 0 && !hasMoreFollowers}}">
+          <text class="no-more-text">— 没有更多了 —</text>
+        </view>
+      </view>
+    </van-tab>
+
+    <!-- 关注 Tab -->
+    <van-tab name="following" title="关注 {{followingTotal > 0 ? '(' + followingTotal + ')' : ''}}">
+      <view class="list-container">
+        <!-- 关注列表 -->
+        <view class="user-list" wx:if="{{following.length > 0}}">
+          <view 
+            class="user-item" 
+            wx:for="{{following}}" 
+            wx:key="id"
+          >
+            <!-- 用户信息区域（可点击跳转） -->
+            <view 
+              class="user-info" 
+              data-user-id="{{item.id}}"
+              bindtap="onUserTap"
+            >
+              <image 
+                src="{{item.avatar_url || '/assets/images/default-avatar.png'}}" 
+                class="user-avatar"
+                mode="aspectFill"
+              />
+              <view class="user-detail">
+                <view class="user-name-row">
+                  <text class="user-name">{{item.nickname}}</text>
+                  <!-- 互关标识 - Requirements: 9.5 -->
+                  <text class="mutual-badge" wx:if="{{item.is_mutual_follow}}">互相关注</text>
+                </view>
+                <text class="user-bio" wx:if="{{item.bio}}">{{item.bio}}</text>
+                <text class="user-bio placeholder" wx:else>暂无简介</text>
+                <text class="user-card-count">{{item.card_count || 0}} 张卡片</text>
+              </view>
+            </view>
+            
+            <!-- 关注按钮 -->
+            <button 
+              class="follow-btn {{item.is_following ? 'following' : ''}}"
+              data-user-id="{{item.id}}"
+              data-is-following="{{item.is_following}}"
+              bindtap="onToggleFollow"
+              disabled="{{operatingUserId === item.id}}"
+            >
+              <text wx:if="{{operatingUserId === item.id}}">...</text>
+              <text wx:elif="{{item.is_mutual_follow}}">互相关注</text>
+              <text wx:elif="{{item.is_following}}">已关注</text>
+              <text wx:else>+ 关注</text>
+            </button>
+          </view>
+        </view>
+
+        <!-- 空状态 -->
+        <view class="empty-state" wx:elif="{{!loadingFollowing}}">
+          <text class="empty-icon">🔍</text>
+          <text class="empty-text">暂无关注</text>
+          <text class="empty-hint">去发现页面找找感兴趣的用户吧</text>
+        </view>
+
+        <!-- 加载更多 -->
+        <view class="load-more" wx:if="{{loadingFollowing}}">
+          <van-loading size="24px" color="#1890ff">加载中...</van-loading>
+        </view>
+
+        <!-- 没有更多 -->
+        <view class="no-more" wx:elif="{{following.length > 0 && !hasMoreFollowing}}">
+          <text class="no-more-text">— 没有更多了 —</text>
+        </view>
+      </view>
+    </van-tab>
+  </van-tabs>
+</view>

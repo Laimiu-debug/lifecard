@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "卡片详情",
+  "usingComponents": {
+    "comment-list": "/components/comment-list/comment-list",
+    "user-avatar": "/components/user-avatar/user-avatar",
+    "empty-state": "/components/empty-state/empty-state"
+  },
+  "enablePullDownRefresh": true,
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true
+}

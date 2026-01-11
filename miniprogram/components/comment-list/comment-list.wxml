@@ -1,0 +1,123 @@
+<!--
+  评论列表组件
+  支持加载更多和发表评论
+  Requirements: 6.4
+-->
+<view class="comment-list">
+  <!-- 评论输入框 -->
+  <view wx:if="{{showInput}}" class="comment-list__input-area">
+    <view class="comment-list__input-wrapper {{inputFocus ? 'comment-list__input-wrapper--focus' : ''}}">
+      <input
+        class="comment-list__input"
+        type="text"
+        placeholder="{{placeholder}}"
+        placeholder-class="comment-list__placeholder"
+        value="{{inputValue}}"
+        maxlength="{{maxLength}}"
+        focus="{{inputFocus}}"
+        bindinput="onInputChange"
+        bindfocus="onInputFocus"
+        bindblur="onInputBlur"
+        bindconfirm="submitComment"
+        confirm-type="send"
+        disabled="{{submitting}}"
+      />
+      <view 
+        class="comment-list__submit {{inputValue.trim() ? 'comment-list__submit--active' : ''}}"
+        bind:tap="submitComment"
+      >
+        <van-loading wx:if="{{submitting}}" size="32rpx" color="#ffffff" />
+        <text wx:else>发送</text>
+      </view>
+    </view>
+    <!-- 字数统计 -->
+    <view wx:if="{{inputValue.length > 0}}" class="comment-list__char-count">
+      <text class="{{inputValue.length > maxLength ? 'comment-list__char-count--exceed' : ''}}">
+        {{inputValue.length}}/{{maxLength}}
+      </text>
+    </view>
+    <!-- 错误提示 -->
+    <view wx:if="{{errorMessage}}" class="comment-list__error">
+      <van-icon name="warning-o" size="28rpx" />
+      <text>{{errorMessage}}</text>
+    </view>
+  </view>
+
+  <!-- 评论列表头部 -->
+  <view class="comment-list__header">
+    <text class="comment-list__title">评论</text>
+    <text class="comment-list__count">({{total}})</text>
+  </view>
+
+  <!-- 加载中状态 -->
+  <view wx:if="{{loading}}" class="comment-list__loading">
+    <van-loading size="48rpx" vertical>加载中...</van-loading>
+  </view>
+
+  <!-- 评论列表 -->
+  <view wx:elif="{{formattedComments.length > 0}}" class="comment-list__items">
+    <view 
+      wx:for="{{formattedComments}}" 
+      wx:key="id" 
+      class="comment-item"
+    >
+      <!-- 用户头像 -->
+      <view 
+        class="comment-item__avatar" 
+        data-user-id="{{item.userId}}"
+        bind:tap="onTapUser"
+      >
+        <image
+          class="comment-item__avatar-img"
+          src="{{item.avatarUrl}}"
+          mode="aspectFill"
+          data-index="{{index}}"
+          binderror="onAvatarError"
+        />
+      </view>
+
+      <!-- 评论内容 -->
+      <view class="comment-item__content">
+        <!-- 用户名和时间 -->
+        <view class="comment-item__header">
+          <text 
+            class="comment-item__nickname"
+            data-user-id="{{item.userId}}"
+            bind:tap="onTapUser"
+          >{{item.nickname}}</text>
+          <text class="comment-item__time">{{item.timeText}}</text>
+        </view>
+
+        <!-- 评论文本 -->
+        <view class="comment-item__text">{{item.content}}</view>
+
+        <!-- 删除按钮 -->
+        <view 
+          wx:if="{{item.canDelete}}" 
+          class="comment-item__delete"
+          data-comment-id="{{item.id}}"
+          bind:tap="deleteComment"
+        >
+          <van-icon name="delete-o" size="28rpx" color="#999" />
+        </view>
+      </view>
+    </view>
+
+    <!-- 加载更多 -->
+    <view wx:if="{{hasMore}}" class="comment-list__load-more" bind:tap="loadMore">
+      <van-loading wx:if="{{loadingMore}}" size="32rpx" />
+      <text wx:else>加载更多评论</text>
+    </view>
+
+    <!-- 没有更多 -->
+    <view wx:elif="{{formattedComments.length > 0}}" class="comment-list__no-more">
+      <text>没有更多评论了</text>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:else class="comment-list__empty">
+    <van-icon name="comment-o" size="96rpx" color="#cccccc" />
+    <text class="comment-list__empty-text">暂无评论，快来抢沙发吧~</text>
+  </view>
+</view>

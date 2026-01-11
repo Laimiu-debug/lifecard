@@ -1,0 +1,49 @@
+<!--
+  空状态组件
+  支持自定义图标和文案
+  Requirements: 5.7
+-->
+<view class="empty-state">
+  <!-- 图标/图片区域 -->
+  <view class="empty-state__icon-wrapper">
+    <!-- 自定义图片 -->
+    <image 
+      wx:if="{{image}}" 
+      class="empty-state__image" 
+      src="{{image}}" 
+      mode="aspectFit"
+      binderror="onImageError"
+    />
+    <!-- 图标 -->
+    <van-icon 
+      wx:else 
+      name="{{displayIcon}}" 
+      size="{{iconSize}}rpx" 
+      color="{{iconColor}}" 
+    />
+  </view>
+
+  <!-- 标题 -->
+  <view wx:if="{{title}}" class="empty-state__title">{{title}}</view>
+
+  <!-- 描述文案 -->
+  <view class="empty-state__description">{{displayDescription}}</view>
+
+  <!-- 自定义内容插槽 -->
+  <slot name="extra"></slot>
+
+  <!-- 操作按钮 -->
+  <view wx:if="{{actionText}}" class="empty-state__action">
+    <van-button 
+      type="primary" 
+      size="small" 
+      round 
+      bind:click="onTapAction"
+    >
+      {{actionText}}
+    </van-button>
+  </view>
+
+  <!-- 底部插槽 -->
+  <slot name="bottom"></slot>
+</view>

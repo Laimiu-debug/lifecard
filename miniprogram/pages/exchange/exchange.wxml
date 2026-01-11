@@ -1,0 +1,211 @@
+<!--
+  交换管理页面
+  显示待处理和已发送请求
+  Requirements: 7.5, 7.6, 7.7
+-->
+<view class="page-container">
+  <!-- Tab 切换 -->
+  <view class="tabs">
+    <view 
+      class="tab-item {{activeTab === 'received' ? 'active' : ''}}"
+      data-tab="received"
+      bindtap="onTabChange"
+    >
+      <text>收到的请求</text>
+      <view class="tab-badge" wx:if="{{pendingTotal > 0}}">{{pendingTotal > 99 ? '99+' : pendingTotal}}</view>
+    </view>
+    <view 
+      class="tab-item {{activeTab === 'sent' ? 'active' : ''}}"
+      data-tab="sent"
+      bindtap="onTabChange"
+    >
+      <text>发出的请求</text>
+      <view class="tab-badge" wx:if="{{sentTotal > 0}}">{{sentTotal > 99 ? '99+' : sentTotal}}</view>
+    </view>
+  </view>
+
+  <!-- 收到的请求列表 -->
+  <view class="exchange-list" wx:if="{{activeTab === 'received'}}">
+    <!-- 加载状态 -->
+    <view class="loading" wx:if="{{pendingLoading && pendingRequests.length === 0}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+
+    <!-- 请求列表 -->
+    <block wx:for="{{pendingRequests}}" wx:key="id">
+      <view class="exchange-item">
+        <!-- 请求者信息 -->
+        <view class="exchange-header" data-user-id="{{item.requester_id}}" bindtap="onUserTap">
+          <image 
+            src="{{item.requester.avatar_url || '/assets/images/default-avatar.png'}}" 
+            class="user-avatar"
+            mode="aspectFill"
+          />
+          <view class="user-info">
+            <text class="user-name">{{item.requester.nickname || '未知用户'}}</text>
+            <text class="request-time">{{item.formattedTime}}</text>
+          </view>
+          <view class="exchange-status status-{{item.status}}">
+            {{item.statusText}}
+          </view>
+        </view>
+
+        <!-- 留言 -->
+        <view class="exchange-message" wx:if="{{item.message}}">
+          <text class="message-label">留言：</text>
+          <text class="message-content">{{item.message}}</text>
+        </view>
+
+        <!-- 卡片预览 -->
+        <view class="card-preview" data-card-id="{{item.card_id}}" bindtap="onCardTap">
+          <image 
+            src="{{item.card.media[0].thumbnail_url || item.card.media[0].url || '/assets/images/default-card.png'}}" 
+            class="card-image" 
+            mode="aspectFill"
+            wx:if="{{item.card && item.card.media && item.card.media.length > 0}}"
+          />
+          <image 
+            src="/assets/images/default-card.png" 
+            class="card-image" 
+            mode="aspectFill"
+            wx:else
+          />
+          <view class="card-info">
+            <text class="card-title">{{item.card.title || '未知卡片'}}</text>
+            <view class="card-meta">
+              <text class="card-type">{{item.card.card_type === 'day_card' ? '一天体验卡' : item.card.card_type === 'week_card' ? '一周体验卡' : item.card.card_type === 'fragment_card' ? '人生片段卡' : '重要时刻卡'}}</text>
+            </view>
+            <view class="card-price">
+              <text class="price-icon">🪙</text>
+              <text class="price-value">{{item.coin_cost}}</text>
+              <text class="price-unit">金币</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 操作按钮 (仅待处理状态显示) -->
+        <view class="exchange-actions" wx:if="{{item.status === 'pending'}}">
+          <button class="action-btn reject-btn" data-id="{{item.id}}" bindtap="onReject">
+            拒绝
+          </button>
+          <button class="action-btn accept-btn" data-id="{{item.id}}" bindtap="onAccept">
+            接受
+          </button>
+        </view>
+
+        <!-- 状态提示 (已处理的请求) -->
+        <view class="status-hint accepted" wx:if="{{item.status === 'accepted'}}">
+          <text class="hint-icon">✅</text>
+          <text class="hint-text">已接受，您获得了 {{item.coin_cost}} 金币</text>
+        </view>
+        <view class="status-hint rejected" wx:if="{{item.status === 'rejected'}}">
+          <text class="hint-icon">❌</text>
+          <text class="hint-text">已拒绝此请求</text>
+        </view>
+        <view class="status-hint expired" wx:if="{{item.status === 'expired'}}">
+          <text class="hint-icon">⏰</text>
+          <text class="hint-text">请求已过期</text>
+        </view>
+      </view>
+    </block>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{!pendingLoading && pendingRequests.length === 0}}">
+      <view class="empty-icon">📭</view>
+      <text class="empty-title">暂无收到的请求</text>
+      <text class="empty-desc">当有人想要交换你的卡片时，会在这里显示</text>
+    </view>
+  </view>
+
+  <!-- 发出的请求列表 -->
+  <view class="exchange-list" wx:if="{{activeTab === 'sent'}}">
+    <!-- 加载状态 -->
+    <view class="loading" wx:if="{{sentLoading && sentRequests.length === 0}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+
+    <!-- 请求列表 -->
+    <block wx:for="{{sentRequests}}" wx:key="id">
+      <view class="exchange-item">
+        <!-- 卡片所有者信息 -->
+        <view class="exchange-header" data-user-id="{{item.card_owner_id}}" bindtap="onUserTap">
+          <image 
+            src="{{item.card_owner.avatar_url || '/assets/images/default-avatar.png'}}" 
+            class="user-avatar"
+            mode="aspectFill"
+          />
+          <view class="user-info">
+            <text class="user-name">{{item.card_owner.nickname || '未知用户'}}</text>
+            <text class="request-time">{{item.formattedTime}}</text>
+          </view>
+          <view class="exchange-status status-{{item.status}}">
+            {{item.statusText}}
+          </view>
+        </view>
+
+        <!-- 留言 -->
+        <view class="exchange-message" wx:if="{{item.message}}">
+          <text class="message-label">我的留言：</text>
+          <text class="message-content">{{item.message}}</text>
+        </view>
+
+        <!-- 卡片预览 -->
+        <view class="card-preview" data-card-id="{{item.card_id}}" bindtap="onCardTap">
+          <image 
+            src="{{item.card.media[0].thumbnail_url || item.card.media[0].url || '/assets/images/default-card.png'}}" 
+            class="card-image" 
+            mode="aspectFill"
+            wx:if="{{item.card && item.card.media && item.card.media.length > 0}}"
+          />
+          <image 
+            src="/assets/images/default-card.png" 
+            class="card-image" 
+            mode="aspectFill"
+            wx:else
+          />
+          <view class="card-info">
+            <text class="card-title">{{item.card.title || '未知卡片'}}</text>
+            <view class="card-meta">
+              <text class="card-type">{{item.card.card_type === 'day_card' ? '一天体验卡' : item.card.card_type === 'week_card' ? '一周体验卡' : item.card.card_type === 'fragment_card' ? '人生片段卡' : '重要时刻卡'}}</text>
+            </view>
+            <view class="card-price">
+              <text class="price-icon">🪙</text>
+              <text class="price-value">{{item.coin_cost}}</text>
+              <text class="price-unit">金币</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 操作按钮 (仅待处理状态显示取消按钮) -->
+        <view class="exchange-actions" wx:if="{{item.status === 'pending'}}">
+          <button class="action-btn cancel-btn" data-id="{{item.id}}" bindtap="onCancel">
+            取消请求
+          </button>
+        </view>
+
+        <!-- 状态提示 -->
+        <view class="status-hint" wx:if="{{item.status === 'accepted'}}">
+          <text class="hint-icon">✅</text>
+          <text class="hint-text">交换成功！卡片已添加到你的收藏</text>
+        </view>
+        <view class="status-hint rejected" wx:if="{{item.status === 'rejected'}}">
+          <text class="hint-icon">❌</text>
+          <text class="hint-text">对方拒绝了你的请求</text>
+        </view>
+        <view class="status-hint expired" wx:if="{{item.status === 'expired'}}">
+          <text class="hint-icon">⏰</text>
+          <text class="hint-text">请求已过期</text>
+        </view>
+      </view>
+    </block>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{!sentLoading && sentRequests.length === 0}}">
+      <view class="empty-icon">📤</view>
+      <text class="empty-title">暂无发出的请求</text>
+      <text class="empty-desc">浏览卡片时，点击交换按钮发起请求</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,180 @@
+<!--
+  通知页面
+  显示分组通知列表
+  Requirements: 10.2, 10.3
+-->
+<view class="page-container">
+  <!-- 顶部操作栏 -->
+  <view class="header">
+    <view class="header-left">
+      <text class="header-title">通知</text>
+      <view class="unread-badge" wx:if="{{totalUnread > 0}}">
+        {{totalUnread > 99 ? '99+' : totalUnread}}
+      </view>
+    </view>
+    <view class="header-actions">
+      <view class="action-btn" bindtap="onToggleView" wx:if="{{activeFilter === 'all'}}">
+        <text class="action-icon">{{showGroupView ? '📋' : '📁'}}</text>
+        <text class="action-text">{{showGroupView ? '列表' : '分组'}}</text>
+      </view>
+      <view class="action-btn" bindtap="onMarkAllRead" wx:if="{{totalUnread > 0}}">
+        <text class="action-icon">✓</text>
+        <text class="action-text">全部已读</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 筛选标签 -->
+  <scroll-view class="filter-scroll" scroll-x enable-flex>
+    <view class="filter-container">
+      <view 
+        class="filter-item {{activeFilter === item.value ? 'active' : ''}}"
+        wx:for="{{filterOptions}}"
+        wx:key="value"
+        data-filter="{{item.value}}"
+        bindtap="onFilterChange"
+      >
+        <text>{{item.label}}</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 分组视图 -->
+  <view class="notification-groups" wx:if="{{showGroupView && activeFilter === 'all'}}">
+    <block wx:for="{{groupedNotifications}}" wx:key="type">
+      <view class="notification-group">
+        <!-- 分组标题 -->
+        <view class="group-header" data-type="{{item.type}}" bindtap="onGroupTap">
+          <view class="group-title">
+            <text class="group-icon">{{item.icon}}</text>
+            <text class="group-name">{{item.title}}</text>
+            <view class="group-badge" wx:if="{{item.unreadCount > 0}}">
+              {{item.unreadCount > 99 ? '99+' : item.unreadCount}}
+            </view>
+          </view>
+          <view class="group-arrow">
+            <text class="arrow-icon">›</text>
+          </view>
+        </view>
+
+        <!-- 分组内最新通知预览（最多显示3条） -->
+        <view class="group-preview">
+          <block wx:for="{{item.notifications}}" wx:for-item="notification" wx:key="id" wx:for-index="idx">
+            <view 
+              class="preview-item {{notification.is_read ? '' : 'unread'}}"
+              wx:if="{{idx < 3}}"
+              data-id="{{notification.id}}"
+              bindtap="onNotificationTap"
+              bindlongpress="onNotificationLongPress"
+            >
+              <!-- 发送者头像 -->
+              <view class="sender-avatar" wx:if="{{notification.sender}}" data-sender-id="{{notification.sender_id}}" catchtap="onSenderTap">
+                <image 
+                  src="{{notification.sender.avatar_url || '/assets/images/default-avatar.png'}}" 
+                  class="avatar-image"
+                  mode="aspectFill"
+                />
+              </view>
+              <view class="sender-avatar default" wx:else>
+                <text class="avatar-icon">{{notification.typeIcon}}</text>
+              </view>
+
+              <!-- 通知内容 -->
+              <view class="preview-content">
+                <view class="preview-title">
+                  <text class="sender-name" wx:if="{{notification.sender}}">{{notification.sender.nickname}}</text>
+                  <text class="notification-action">{{notification.title}}</text>
+                </view>
+                <text class="preview-text">{{notification.content}}</text>
+                <text class="preview-time">{{notification.formattedTime}}</text>
+              </view>
+
+              <!-- 未读标记 -->
+              <view class="unread-dot" wx:if="{{!notification.is_read}}"></view>
+            </view>
+          </block>
+
+          <!-- 查看更多 -->
+          <view class="view-more" wx:if="{{item.notifications.length > 3}}" data-type="{{item.type}}" bindtap="onGroupTap">
+            <text class="view-more-text">查看全部 {{item.notifications.length}} 条</text>
+            <text class="view-more-arrow">›</text>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{!loading && groupedNotifications.length === 0}}">
+      <view class="empty-icon">🔔</view>
+      <text class="empty-title">暂无通知</text>
+      <text class="empty-desc">当有人与你互动时，会在这里显示</text>
+    </view>
+  </view>
+
+  <!-- 列表视图 -->
+  <view class="notification-list" wx:else>
+    <block wx:for="{{notifications}}" wx:key="id">
+      <view 
+        class="notification-item {{item.is_read ? '' : 'unread'}}"
+        data-id="{{item.id}}"
+        bindtap="onNotificationTap"
+        bindlongpress="onNotificationLongPress"
+      >
+        <!-- 发送者头像 -->
+        <view class="notification-avatar" wx:if="{{item.sender}}" data-sender-id="{{item.sender_id}}" catchtap="onSenderTap">
+          <image 
+            src="{{item.sender.avatar_url || '/assets/images/default-avatar.png'}}" 
+            class="avatar-image"
+            mode="aspectFill"
+          />
+          <view class="type-badge">
+            <text>{{item.typeIcon}}</text>
+          </view>
+        </view>
+        <view class="notification-avatar default" wx:else>
+          <text class="avatar-icon">{{item.typeIcon}}</text>
+        </view>
+
+        <!-- 通知内容 -->
+        <view class="notification-content">
+          <view class="notification-header">
+            <text class="sender-name" wx:if="{{item.sender}}">{{item.sender.nickname}}</text>
+            <text class="notification-title">{{item.title}}</text>
+          </view>
+          <text class="notification-text">{{item.content}}</text>
+          <view class="notification-meta">
+            <text class="notification-type">{{item.typeLabel}}</text>
+            <text class="notification-time">{{item.formattedTime}}</text>
+          </view>
+        </view>
+
+        <!-- 未读标记 -->
+        <view class="unread-dot" wx:if="{{!item.is_read}}"></view>
+      </view>
+    </block>
+
+    <!-- 加载更多 -->
+    <view class="load-more" wx:if="{{hasMore && notifications.length > 0}}">
+      <view class="loading-spinner" wx:if="{{loading}}"></view>
+      <text class="load-more-text">{{loading ? '加载中...' : '上拉加载更多'}}</text>
+    </view>
+
+    <!-- 没有更多 -->
+    <view class="no-more" wx:if="{{!hasMore && notifications.length > 0}}">
+      <text class="no-more-text">没有更多了</text>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{!loading && notifications.length === 0}}">
+      <view class="empty-icon">🔔</view>
+      <text class="empty-title">暂无{{activeFilterLabel}}通知</text>
+      <text class="empty-desc">当有人与你互动时，会在这里显示</text>
+    </view>
+  </view>
+
+  <!-- 全局加载状态 -->
+  <view class="loading-overlay" wx:if="{{loading && notifications.length === 0 && groupedNotifications.length === 0}}">
+    <view class="loading-spinner large"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+</view>

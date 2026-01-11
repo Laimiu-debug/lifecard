@@ -1,0 +1,637 @@
+/**
+ * 个人中心页面样式
+ * Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 11.1
+ */
+
+.page-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding-bottom: 40rpx;
+}
+
+/* ==================== 未登录状态 ==================== */
+.login-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 48rpx;
+  background-color: #ffffff;
+  margin-bottom: 24rpx;
+}
+
+.avatar-placeholder {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+}
+
+.login-text {
+  font-size: 28rpx;
+  color: #999999;
+  margin: 32rpx 0;
+}
+
+.login-btn {
+  width: 400rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  font-size: 32rpx;
+  border-radius: 44rpx;
+  border: none;
+}
+
+.login-btn::after {
+  border: none;
+}
+
+/* ==================== 用户信息卡片 ==================== */
+.profile-card {
+  background-color: #ffffff;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+}
+
+.profile-header {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 32rpx;
+}
+
+.avatar-lg {
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background-color: #f0f0f0;
+}
+
+.profile-info {
+  flex: 1;
+  margin-left: 24rpx;
+  overflow: hidden;
+}
+
+.nickname {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333333;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.bio {
+  font-size: 26rpx;
+  color: #666666;
+  display: block;
+  margin-bottom: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-meta {
+  display: flex;
+  align-items: center;
+}
+
+.meta-icon {
+  font-size: 24rpx;
+  margin-right: 4rpx;
+}
+
+.meta-text {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.edit-btn {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 20rpx;
+  background-color: #f5f5f5;
+  border-radius: 32rpx;
+  font-size: 26rpx;
+  color: #666666;
+}
+
+.edit-icon {
+  font-size: 24rpx;
+  margin-right: 4rpx;
+}
+
+/* ==================== 统计数据 ==================== */
+.stats-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding-top: 24rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  padding: 8rpx 0;
+}
+
+.stat-divider {
+  width: 1rpx;
+  height: 48rpx;
+  background-color: #f0f0f0;
+}
+
+.stat-value {
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #333333;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #999999;
+  margin-top: 8rpx;
+}
+
+/* ==================== 金币卡片 ==================== */
+.coin-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  padding: 32rpx;
+  margin: 0 24rpx 24rpx;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 16rpx rgba(252, 182, 159, 0.3);
+}
+
+.coin-left {
+  display: flex;
+  align-items: center;
+}
+
+.coin-icon-wrapper {
+  width: 80rpx;
+  height: 80rpx;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+}
+
+.coin-icon {
+  font-size: 48rpx;
+}
+
+.coin-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.coin-label {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333333;
+}
+
+.coin-hint {
+  font-size: 22rpx;
+  color: #666666;
+  margin-top: 4rpx;
+}
+
+.coin-right {
+  display: flex;
+  align-items: center;
+}
+
+.coin-amount {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #e67e22;
+  margin-right: 8rpx;
+}
+
+.arrow-icon {
+  font-size: 36rpx;
+  color: #999999;
+}
+
+/* ==================== 功能菜单网格 ==================== */
+.menu-section {
+  background-color: #ffffff;
+  padding: 24rpx 32rpx;
+  margin-bottom: 24rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333333;
+  margin-bottom: 24rpx;
+}
+
+.menu-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.menu-grid-item {
+  width: 25%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16rpx 0;
+}
+
+.menu-icon-wrapper {
+  width: 88rpx;
+  height: 88rpx;
+  background-color: #f5f5f5;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12rpx;
+}
+
+.menu-icon {
+  font-size: 40rpx;
+}
+
+.menu-text {
+  font-size: 24rpx;
+  color: #666666;
+}
+
+/* ==================== 通知徽章 Requirements: 10.1 ==================== */
+.notification-icon-wrapper {
+  position: relative;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  padding: 0 8rpx;
+  background-color: #ff4d4f;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx solid #ffffff;
+  box-sizing: border-box;
+}
+
+.notification-badge text {
+  font-size: 20rpx;
+  color: #ffffff;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* ==================== 设置菜单列表 ==================== */
+.menu-list {
+  background-color: #ffffff;
+  margin-bottom: 24rpx;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-item:active {
+  background-color: #f5f5f5;
+}
+
+.menu-item-icon {
+  font-size: 36rpx;
+  margin-right: 20rpx;
+}
+
+.menu-item-text {
+  flex: 1;
+  font-size: 30rpx;
+  color: #333333;
+}
+
+.menu-item-arrow {
+  font-size: 32rpx;
+  color: #cccccc;
+}
+
+.logout-item .menu-item-text {
+  color: #ff4d4f;
+}
+
+.text-danger {
+  color: #ff4d4f !important;
+}
+
+/* ==================== 版本信息 ==================== */
+.version-info {
+  text-align: center;
+  padding: 32rpx;
+}
+
+.version-info text {
+  font-size: 24rpx;
+  color: #cccccc;
+}
+
+/* ==================== 加载状态 ==================== */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.loading-spinner {
+  width: 64rpx;
+  height: 64rpx;
+  border: 4rpx solid #f0f0f0;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==================== 通用样式 ==================== */
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ==================== 编辑资料弹窗 ==================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal-content {
+  width: 100%;
+  max-height: 90vh;
+  background-color: #ffffff;
+  border-radius: 24rpx 24rpx 0 0;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.modal-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #333333;
+}
+
+.modal-close {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  color: #999999;
+}
+
+.modal-body {
+  flex: 1;
+  padding: 32rpx;
+  max-height: 60vh;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 24rpx;
+  padding: 24rpx 32rpx;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.modal-footer .btn {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  font-size: 32rpx;
+  border-radius: 44rpx;
+  border: none;
+}
+
+.modal-footer .btn-secondary {
+  background-color: #f5f5f5;
+  color: #666666;
+}
+
+.modal-footer .btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+}
+
+.modal-footer .btn[disabled] {
+  opacity: 0.6;
+}
+
+/* ==================== 表单样式 ==================== */
+.form-item {
+  margin-bottom: 32rpx;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  font-size: 28rpx;
+  color: #333333;
+  margin-bottom: 16rpx;
+}
+
+.form-label .required {
+  color: #ff4d4f;
+  margin-left: 4rpx;
+}
+
+.form-input {
+  width: 100%;
+  height: 88rpx;
+  padding: 0 24rpx;
+  font-size: 30rpx;
+  color: #333333;
+  background-color: #f5f5f5;
+  border-radius: 12rpx;
+  border: 2rpx solid transparent;
+  box-sizing: border-box;
+}
+
+.form-input.input-error {
+  border-color: #ff4d4f;
+  background-color: #fff2f0;
+}
+
+.form-textarea {
+  width: 100%;
+  min-height: 160rpx;
+  padding: 24rpx;
+  font-size: 30rpx;
+  color: #333333;
+  background-color: #f5f5f5;
+  border-radius: 12rpx;
+  border: 2rpx solid transparent;
+  box-sizing: border-box;
+}
+
+.form-textarea.input-error {
+  border-color: #ff4d4f;
+  background-color: #fff2f0;
+}
+
+.form-error {
+  font-size: 24rpx;
+  color: #ff4d4f;
+  margin-top: 8rpx;
+}
+
+.form-hint {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 24rpx;
+  color: #999999;
+  margin-top: 8rpx;
+}
+
+.form-picker {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 88rpx;
+  padding: 0 24rpx;
+  background-color: #f5f5f5;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  color: #333333;
+}
+
+.form-picker .placeholder {
+  color: #999999;
+}
+
+.picker-arrow {
+  font-size: 32rpx;
+  color: #cccccc;
+}
+
+/* ==================== 头像编辑 ==================== */
+.avatar-form-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40rpx;
+}
+
+.avatar-form-item .form-label {
+  align-self: flex-start;
+}
+
+.avatar-edit-wrapper {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+}
+
+.avatar-edit {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+}
+
+.avatar-edit-overlay {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 48rpx;
+  height: 48rpx;
+  background-color: #667eea;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4rpx solid #ffffff;
+}
+
+.avatar-edit-icon {
+  font-size: 24rpx;
+}
+
+.avatar-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-spinner-small {
+  width: 40rpx;
+  height: 40rpx;
+  border: 4rpx solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}

@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "我的卡片",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "card-item": "/components/card-item/card-item",
+    "empty-state": "/components/empty-state/empty-state"
+  }
+}

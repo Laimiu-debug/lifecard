@@ -1,0 +1,13 @@
+{
+  "navigationBarTitleText": "Life Card",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "card-item": "/components/card-item/card-item",
+    "van-icon": "@vant/weapp/icon/index",
+    "van-badge": "@vant/weapp/info/index",
+    "van-button": "@vant/weapp/button/index",
+    "van-loading": "@vant/weapp/loading/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-divider": "@vant/weapp/divider/index"
+  }
+}

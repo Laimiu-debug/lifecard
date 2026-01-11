@@ -1,0 +1,68 @@
+<!--pages/discover/discover.wxml-->
+<view class="page-container">
+  <!-- 热门卡片 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">🔥 热门卡片</text>
+      <view class="time-range">
+        <text 
+          class="range-item {{timeRange === 'day' ? 'active' : ''}}"
+          data-range="day"
+          bindtap="onTimeRangeChange"
+        >今日</text>
+        <text 
+          class="range-item {{timeRange === 'week' ? 'active' : ''}}"
+          data-range="week"
+          bindtap="onTimeRangeChange"
+        >本周</text>
+        <text 
+          class="range-item {{timeRange === 'month' ? 'active' : ''}}"
+          data-range="month"
+          bindtap="onTimeRangeChange"
+        >本月</text>
+      </view>
+    </view>
+    <scroll-view class="hot-list" scroll-x enable-flex>
+      <view 
+        class="hot-card" 
+        wx:for="{{hotCards}}" 
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onCardTap"
+      >
+        <image src="{{item.media[0].thumbnail_url || item.media[0].url}}" class="hot-image" mode="aspectFill" />
+        <view class="hot-info">
+          <text class="hot-title text-ellipsis">{{item.title}}</text>
+          <text class="hot-stats">❤️ {{item.like_count}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 随机发现 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">🎲 随机发现</text>
+      <text class="refresh-btn" bindtap="onRefreshRandom">换一批</text>
+    </view>
+    <view class="random-list">
+      <view 
+        class="random-card" 
+        wx:for="{{randomCards}}" 
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onCardTap"
+      >
+        <image src="{{item.media[0].thumbnail_url || item.media[0].url}}" class="random-image" mode="aspectFill" />
+        <view class="random-info">
+          <text class="random-title text-ellipsis-2">{{item.title}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+</view>

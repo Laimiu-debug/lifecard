@@ -1,0 +1,381 @@
+<!--pages/my-cards/my-cards.wxml-->
+<!-- 我的卡片页面 -->
+<!-- Requirements: 8.1 - 实现创建/收藏 Tab 切换 -->
+<!-- Requirements: 8.2, 8.3, 8.5 - 文件夹管理 -->
+<!-- Requirements: 8.6, 8.7 - 时间线和分类视图 -->
+
+<view class="page-container">
+  <!-- Tab 切换 -->
+  <view class="tabs">
+    <view 
+      class="tab-item {{activeTab === 'created' ? 'active' : ''}}"
+      data-tab="created"
+      bindtap="onTabChange"
+    >
+      <text class="tab-text">我创建的</text>
+      <text class="tab-count" wx:if="{{createdCount > 0}}">({{createdCount}})</text>
+    </view>
+    <view 
+      class="tab-item {{activeTab === 'collected' ? 'active' : ''}}"
+      data-tab="collected"
+      bindtap="onTabChange"
+    >
+      <text class="tab-text">我收藏的</text>
+      <text class="tab-count" wx:if="{{collectedCount > 0}}">({{collectedCount}})</text>
+    </view>
+  </view>
+
+  <!-- 视图模式切换 -->
+  <!-- Requirements: 8.6, 8.7 - 时间线和分类视图 -->
+  <view class="view-mode-bar">
+    <view class="view-mode-left">
+      <view 
+        class="view-mode-item {{viewMode === 'list' ? 'active' : ''}}"
+        data-mode="list"
+        bindtap="onViewModeChange"
+      >
+        <text class="view-mode-icon">📋</text>
+        <text class="view-mode-text">列表</text>
+      </view>
+      <view 
+        class="view-mode-item {{viewMode === 'timeline' ? 'active' : ''}}"
+        data-mode="timeline"
+        bindtap="onViewModeChange"
+      >
+        <text class="view-mode-icon">📅</text>
+        <text class="view-mode-text">时间线</text>
+      </view>
+      <view 
+        class="view-mode-item {{viewMode === 'category' ? 'active' : ''}}"
+        data-mode="category"
+        bindtap="onViewModeChange"
+      >
+        <text class="view-mode-icon">📂</text>
+        <text class="view-mode-text">分类</text>
+      </view>
+    </view>
+    <view class="view-mode-right">
+      <text class="total-count">共 {{total}} 张</text>
+    </view>
+  </view>
+
+  <!-- 文件夹区域（仅收藏 Tab 显示） -->
+  <view class="folder-section" wx:if="{{activeTab === 'collected'}}">
+    <view class="folder-header">
+      <text class="folder-title">文件夹</text>
+      <view class="folder-add-btn" bindtap="onShowCreateFolder">
+        <text class="add-icon">+</text>
+        <text class="add-text">新建</text>
+      </view>
+    </view>
+    
+    <scroll-view class="folder-scroll" scroll-x wx:if="{{folders.length > 0}}">
+      <!-- 全部卡片选项 -->
+      <view 
+        class="folder-item {{selectedFolderId === null ? 'active' : ''}}"
+        data-id="{{null}}"
+        bindtap="onSelectFolder"
+      >
+        <view class="folder-icon">📁</view>
+        <text class="folder-name">全部</text>
+      </view>
+      
+      <!-- 文件夹列表 -->
+      <view 
+        class="folder-item {{selectedFolderId === item.id ? 'active' : ''}}"
+        wx:for="{{folders}}" 
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onSelectFolder"
+        bindlongpress="onFolderLongPress"
+      >
+        <view class="folder-icon">📂</view>
+        <text class="folder-name">{{item.name}}</text>
+        <text class="folder-count" wx:if="{{item.card_count > 0}}">({{item.card_count}})</text>
+      </view>
+    </scroll-view>
+    
+    <!-- 无文件夹提示 -->
+    <view class="folder-empty" wx:if="{{folders.length === 0}}">
+      <text class="folder-empty-text">暂无文件夹，点击"新建"创建</text>
+    </view>
+  </view>
+
+  <!-- 卡片列表 -->
+  <scroll-view 
+    class="card-scroll {{activeTab === 'collected' ? 'with-folders' : ''}} {{viewMode !== 'list' ? 'with-view-mode' : ''}}"
+    scroll-y
+    refresher-enabled
+    refresher-triggered="{{refreshing}}"
+    bindrefresherrefresh="onPullDownRefresh"
+    bindscrolltolower="onReachBottom"
+  >
+    <!-- 列表视图 -->
+    <view class="card-list" wx:if="{{viewMode === 'list' && cards.length > 0}}">
+      <view 
+        class="card-item" 
+        wx:for="{{cards}}" 
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onCardTap"
+        bindlongpress="onCardLongPress"
+      >
+        <!-- 卡片封面 -->
+        <view class="card-cover">
+          <image 
+            src="{{item.media[0].thumbnail_url || item.media[0].url}}" 
+            class="card-image" 
+            mode="aspectFill"
+            wx:if="{{item.media && item.media.length > 0}}"
+          />
+          <view class="card-placeholder" wx:else>
+            <text class="placeholder-icon">📷</text>
+          </view>
+          <!-- 卡片类型标签 -->
+          <view class="card-type-tag">{{item.cardTypeLabel}}</view>
+        </view>
+        
+        <!-- 卡片信息 -->
+        <view class="card-info">
+          <text class="card-title text-ellipsis">{{item.title}}</text>
+          <view class="card-meta">
+            <text class="card-date">{{item.formattedDate}}</text>
+            <view class="card-stats">
+              <text class="stat-item">❤️ {{item.like_count}}</text>
+              <text class="stat-item">💬 {{item.comment_count}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 时间线视图 -->
+    <!-- Requirements: 8.6 - 按日期分组 -->
+    <view class="timeline-view" wx:if="{{viewMode === 'timeline' && timelineGroups.length > 0}}">
+      <view class="timeline-group" wx:for="{{timelineGroups}}" wx:key="date" wx:for-item="group">
+        <!-- 日期标题 -->
+        <view class="timeline-header">
+          <view class="timeline-dot"></view>
+          <text class="timeline-date">{{group.dateLabel}}</text>
+          <text class="timeline-count">({{group.cards.length}}张)</text>
+        </view>
+        
+        <!-- 该日期下的卡片 -->
+        <view class="timeline-cards">
+          <view 
+            class="timeline-card-item" 
+            wx:for="{{group.cards}}" 
+            wx:key="id"
+            wx:for-item="card"
+            data-id="{{card.id}}"
+            bindtap="onCardTap"
+            bindlongpress="onCardLongPress"
+          >
+            <view class="timeline-card-cover">
+              <image 
+                src="{{card.media[0].thumbnail_url || card.media[0].url}}" 
+                class="timeline-card-image" 
+                mode="aspectFill"
+                wx:if="{{card.media && card.media.length > 0}}"
+              />
+              <view class="timeline-card-placeholder" wx:else>
+                <text class="placeholder-icon">📷</text>
+              </view>
+            </view>
+            <view class="timeline-card-info">
+              <text class="timeline-card-title text-ellipsis">{{card.title}}</text>
+              <view class="timeline-card-meta">
+                <text class="timeline-card-type">{{card.cardTypeLabel}}</text>
+                <view class="timeline-card-stats">
+                  <text class="stat-item">❤️ {{card.like_count}}</text>
+                  <text class="stat-item">💬 {{card.comment_count}}</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 分类视图 -->
+    <!-- Requirements: 8.7 - 按类型分组 -->
+    <view class="category-view" wx:if="{{viewMode === 'category' && categoryGroups.length > 0}}">
+      <view class="category-group" wx:for="{{categoryGroups}}" wx:key="cardType" wx:for-item="group">
+        <!-- 分类标题 -->
+        <view class="category-header">
+          <text class="category-icon">{{group.typeIcon}}</text>
+          <text class="category-name">{{group.typeLabel}}</text>
+          <text class="category-count">({{group.count}}张)</text>
+        </view>
+        
+        <!-- 该分类下的卡片 -->
+        <view class="category-cards">
+          <view 
+            class="category-card-item" 
+            wx:for="{{group.cards}}" 
+            wx:key="id"
+            wx:for-item="card"
+            data-id="{{card.id}}"
+            bindtap="onCardTap"
+            bindlongpress="onCardLongPress"
+          >
+            <view class="category-card-cover">
+              <image 
+                src="{{card.media[0].thumbnail_url || card.media[0].url}}" 
+                class="category-card-image" 
+                mode="aspectFill"
+                wx:if="{{card.media && card.media.length > 0}}"
+              />
+              <view class="category-card-placeholder" wx:else>
+                <text class="placeholder-icon">📷</text>
+              </view>
+            </view>
+            <view class="category-card-info">
+              <text class="category-card-title text-ellipsis">{{card.title}}</text>
+              <view class="category-card-meta">
+                <text class="category-card-date">{{card.formattedDate}}</text>
+                <view class="category-card-stats">
+                  <text class="stat-item">❤️ {{card.like_count}}</text>
+                  <text class="stat-item">💬 {{card.comment_count}}</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 加载状态 -->
+    <view class="loading" wx:if="{{loading && cards.length > 0}}">
+      <text>加载中...</text>
+    </view>
+
+    <!-- 没有更多 -->
+    <view class="no-more" wx:if="{{!hasMore && cards.length > 0}}">
+      <text>没有更多了</text>
+    </view>
+
+    <!-- 空状态 - 时间线视图 -->
+    <view class="empty" wx:if="{{!loading && viewMode === 'timeline' && timelineGroups.length === 0 && cards.length === 0}}">
+      <view class="empty-icon">📅</view>
+      <text class="empty-title">暂无卡片</text>
+      <text class="empty-desc">{{activeTab === 'created' ? '创建卡片后将按日期分组显示' : '收藏卡片后将按日期分组显示'}}</text>
+    </view>
+
+    <!-- 空状态 - 分类视图 -->
+    <view class="empty" wx:if="{{!loading && viewMode === 'category' && categoryGroups.length === 0 && cards.length === 0}}">
+      <view class="empty-icon">📂</view>
+      <text class="empty-title">暂无卡片</text>
+      <text class="empty-desc">{{activeTab === 'created' ? '创建卡片后将按类型分组显示' : '收藏卡片后将按类型分组显示'}}</text>
+    </view>
+
+    <!-- 空状态 - 创建的卡片（列表视图） -->
+    <view class="empty" wx:if="{{!loading && viewMode === 'list' && cards.length === 0 && activeTab === 'created'}}">
+      <view class="empty-icon">📝</view>
+      <text class="empty-title">还没有创建卡片</text>
+      <text class="empty-desc">记录你的人生体验，与他人分享精彩时刻</text>
+      <button class="empty-btn" bindtap="onCreateCard">创建第一张卡片</button>
+    </view>
+
+    <!-- 空状态 - 收藏的卡片（列表视图） -->
+    <view class="empty" wx:if="{{!loading && viewMode === 'list' && cards.length === 0 && activeTab === 'collected'}}">
+      <view class="empty-icon">💎</view>
+      <text class="empty-title">还没有收藏卡片</text>
+      <text class="empty-desc">发现感兴趣的卡片，通过交换收藏它们</text>
+      <button class="empty-btn" bindtap="onGoDiscover">去发现</button>
+    </view>
+
+    <!-- 初始加载状态 -->
+    <view class="initial-loading" wx:if="{{loading && cards.length === 0}}">
+      <view class="loading-spinner"></view>
+      <text>加载中...</text>
+    </view>
+  </scroll-view>
+
+  <!-- 文件夹创建/重命名弹窗 -->
+  <view class="modal-mask" wx:if="{{showFolderModal}}" bindtap="onCloseFolderModal">
+    <view class="modal-content" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">{{folderModalTitle}}</text>
+        <view class="modal-close" bindtap="onCloseFolderModal">✕</view>
+      </view>
+      <view class="modal-body">
+        <input 
+          class="folder-input {{folderInputError ? 'error' : ''}}"
+          placeholder="请输入文件夹名称"
+          value="{{folderInputValue}}"
+          bindinput="onFolderInputChange"
+          maxlength="50"
+          focus="{{showFolderModal}}"
+        />
+        <text class="input-error" wx:if="{{folderInputError}}">{{folderInputError}}</text>
+        <text class="input-hint">最多50个字符</text>
+      </view>
+      <view class="modal-footer">
+        <button class="modal-btn cancel" bindtap="onCloseFolderModal">取消</button>
+        <button class="modal-btn confirm" bindtap="onConfirmFolderModal">确定</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 文件夹操作菜单 -->
+  <view class="action-sheet-mask" wx:if="{{showFolderActionSheet}}" bindtap="onCloseFolderActionSheet">
+    <view class="action-sheet" catchtap="">
+      <view class="action-sheet-header">
+        <text class="action-sheet-title">{{actionFolderName}}</text>
+      </view>
+      <view class="action-sheet-item" data-action="rename" bindtap="onFolderActionSelect">
+        <text class="action-icon">✏️</text>
+        <text class="action-text">重命名</text>
+      </view>
+      <view class="action-sheet-item danger" data-action="delete" bindtap="onFolderActionSelect">
+        <text class="action-icon">🗑️</text>
+        <text class="action-text">删除</text>
+      </view>
+      <view class="action-sheet-cancel" bindtap="onCloseFolderActionSheet">
+        <text>取消</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 移动到文件夹选择面板 -->
+  <!-- Requirements: 8.4 -->
+  <view class="action-sheet-mask" wx:if="{{showMoveToFolderSheet}}" bindtap="onCloseMoveToFolderSheet">
+    <view class="action-sheet move-folder-sheet" catchtap="">
+      <view class="action-sheet-header">
+        <text class="action-sheet-title">移动到文件夹</text>
+        <text class="action-sheet-subtitle">{{movingCardTitle}}</text>
+      </view>
+      
+      <!-- 未分类选项 -->
+      <view class="folder-select-item" data-id="{{null}}" bindtap="onSelectTargetFolder">
+        <view class="folder-select-icon">📁</view>
+        <text class="folder-select-name">未分类</text>
+        <text class="folder-select-hint">移出所有文件夹</text>
+      </view>
+      
+      <!-- 文件夹列表 -->
+      <view 
+        class="folder-select-item" 
+        wx:for="{{folders}}" 
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onSelectTargetFolder"
+      >
+        <view class="folder-select-icon">📂</view>
+        <text class="folder-select-name">{{item.name}}</text>
+        <text class="folder-select-count" wx:if="{{item.card_count > 0}}">({{item.card_count}}张)</text>
+      </view>
+      
+      <!-- 新建文件夹选项 -->
+      <view class="folder-select-item create-new" bindtap="onCreateFolderFromMoveSheet">
+        <view class="folder-select-icon">➕</view>
+        <text class="folder-select-name">新建文件夹</text>
+      </view>
+      
+      <view class="action-sheet-cancel" bindtap="onCloseMoveToFolderSheet">
+        <text>取消</text>
+      </view>
+    </view>
+  </view>
+</view>

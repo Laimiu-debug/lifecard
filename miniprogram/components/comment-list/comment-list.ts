@@ -175,6 +175,12 @@ Component({
     formatComments() {
       const { comments, currentUserId } = this.data;
       
+      // 防御性检查
+      if (!comments || !Array.isArray(comments)) {
+        this.setData({ formattedComments: [] });
+        return;
+      }
+      
       const formattedComments = comments.map(comment => {
         const user = comment.user;
         return {

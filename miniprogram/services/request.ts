@@ -247,10 +247,29 @@ class RequestService {
 
           // 成功响应 (2xx)
           if (statusCode >= 200 && statusCode < 300) {
-            resolve({
-              success: true,
-              data: responseData as T,
-            });
+            // 后端返回的是 ApiResponse 格式: { success, data, message }
+            // 需要解包取出真正的 data
+            const apiResponse = responseData as any;
+            if (apiResponse && typeof apiResponse === 'object' && 'success' in apiResponse) {
+              // 这是 ApiResponse 格式
+              if (apiResponse.success) {
+                resolve({
+                  success: true,
+                  data: apiResponse.data as T,
+                });
+              } else {
+                resolve({
+                  success: false,
+                  message: apiResponse.message || '请求失败',
+                });
+              }
+            } else {
+              // 不是 ApiResponse 格式，直接返回
+              resolve({
+                success: true,
+                data: responseData as T,
+              });
+            }
             return;
           }
 

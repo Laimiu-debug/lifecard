@@ -75,11 +75,11 @@ class CardService {
    * 
    * Requirements: 3.8
    * @param data 卡片创建数据
-   * @returns 创建的卡片和获得的金币
+   * @returns 创建的卡片（后端目前不返回 coins_earned）
    */
-  async createCard(data: CardCreateData): Promise<CardCreateResult> {
+  async createCard(data: CardCreateData): Promise<LifeCard> {
     try {
-      const result = await request.post<CardCreateResult>('/api/cards', data);
+      const result = await request.post<LifeCard>('/api/cards', data);
       return result;
     } catch (error) {
       console.error('Create card failed:', error);
@@ -151,7 +151,14 @@ class CardService {
         params.cursor = cursor;
       }
       const result = await request.get<CardFeedResult>('/api/cards/feed', params);
-      return result;
+      console.log('Feed result:', result);
+      
+      // 确保返回正确格式
+      return {
+        cards: result?.cards || [],
+        has_more: result?.has_more || false,
+        next_cursor: result?.next_cursor,
+      };
     } catch (error) {
       console.error('Get feed failed:', error);
       throw error;
@@ -256,11 +263,19 @@ class CardService {
    */
   async getMyCards(page: number = 1, pageSize: number = 20): Promise<PaginatedResult<LifeCard>> {
     try {
-      const result = await request.get<PaginatedResult<LifeCard>>('/api/cards/my-cards', {
+      const result = await request.get<any>('/api/cards/my-cards', {
         page,
         page_size: pageSize,
       });
-      return result;
+      
+      // 适配后端返回格式 { data: [], pagination: { total_count, ... } }
+      return {
+        items: result?.data || [],
+        total: result?.pagination?.total_count || 0,
+        page: result?.pagination?.page || page,
+        page_size: result?.pagination?.page_size || pageSize,
+        has_more: page < (result?.pagination?.total_pages || 1),
+      };
     } catch (error) {
       console.error('Get my cards failed:', error);
       throw error;
@@ -276,11 +291,19 @@ class CardService {
    */
   async getCollectedCards(page: number = 1, pageSize: number = 20): Promise<PaginatedResult<LifeCard>> {
     try {
-      const result = await request.get<PaginatedResult<LifeCard>>('/api/cards/collected', {
+      const result = await request.get<any>('/api/cards/collected', {
         page,
         page_size: pageSize,
       });
-      return result;
+      
+      // 适配后端返回格式
+      return {
+        items: result?.data || [],
+        total: result?.pagination?.total_count || 0,
+        page: result?.pagination?.page || page,
+        page_size: result?.pagination?.page_size || pageSize,
+        has_more: page < (result?.pagination?.total_pages || 1),
+      };
     } catch (error) {
       console.error('Get collected cards failed:', error);
       throw error;
@@ -301,11 +324,19 @@ class CardService {
     pageSize: number = 20
   ): Promise<PaginatedResult<LifeCard>> {
     try {
-      const result = await request.get<PaginatedResult<LifeCard>>(`/api/users/${userId}/cards`, {
+      const result = await request.get<any>(`/api/users/${userId}/cards`, {
         page,
         page_size: pageSize,
       });
-      return result;
+      
+      // 适配后端返回格式
+      return {
+        items: result?.data || [],
+        total: result?.pagination?.total_count || 0,
+        page: result?.pagination?.page || page,
+        page_size: result?.pagination?.page_size || pageSize,
+        has_more: page < (result?.pagination?.total_pages || 1),
+      };
     } catch (error) {
       console.error('Get user cards failed:', error);
       throw error;
@@ -410,11 +441,20 @@ class CardService {
     pageSize: number = 20
   ): Promise<CommentPaginatedResult> {
     try {
-      const result = await request.get<CommentPaginatedResult>(`/api/cards/${cardId}/comments`, {
+      // 后端返回的是 Comment[] 数组，需要包装成分页格式
+      const comments = await request.get<Comment[]>(`/api/cards/${cardId}/comments`, {
         page,
         page_size: pageSize,
       });
-      return result;
+      
+      // 包装成前端期望的格式
+      return {
+        comments: comments || [],
+        total: comments?.length || 0,
+        page,
+        page_size: pageSize,
+        has_more: (comments?.length || 0) >= pageSize,
+      };
     } catch (error) {
       console.error('Get comments failed:', error);
       throw error;

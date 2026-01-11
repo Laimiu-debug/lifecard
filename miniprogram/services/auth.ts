@@ -139,8 +139,11 @@ class AuthService {
         false // 登录接口不需要认证
       );
 
+      console.log('Login API response:', response);
+
       // 4. 存储 token
-      this.saveToken(response.token);
+      const saveResult = this.saveToken(response.token);
+      console.log('Token save result:', saveResult);
 
       // 5. 存储用户资料
       this.saveUserProfile(response.user);
@@ -252,8 +255,8 @@ class AuthService {
    * 
    * Requirements: 1.4
    */
-  private saveToken(token: string, expiresIn: number = TOKEN_EXPIRES_IN): void {
-    storage.setToken(token, expiresIn);
+  private saveToken(token: string, expiresIn: number = TOKEN_EXPIRES_IN): boolean {
+    return storage.setToken(token, expiresIn);
   }
 
   /**

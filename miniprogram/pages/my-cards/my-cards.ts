@@ -406,7 +406,8 @@ Page({
    * 跳转到创建卡片页面
    */
   onCreateCard() {
-    wx.navigateTo({
+    // create 是 tabBar 页面，需要用 switchTab
+    wx.switchTab({
       url: '/pages/create/create',
     });
   },

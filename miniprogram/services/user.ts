@@ -257,8 +257,9 @@ class UserService {
    */
   async getBalance(): Promise<BalanceInfo> {
     try {
-      const result = await request.get<BalanceInfo>('/api/users/me/balance');
-      return result;
+      // 后端接口是 /api/users/me/coins
+      const result = await request.get<{ coin_balance: number }>('/api/users/me/coins');
+      return { balance: result?.coin_balance || 0 };
     } catch (error) {
       console.error('Get balance failed:', error);
       throw error;

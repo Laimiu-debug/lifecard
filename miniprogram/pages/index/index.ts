@@ -11,6 +11,7 @@ import { createStoreBindings } from 'mobx-miniprogram-bindings';
 import { cardStore } from '../../stores/card';
 import { notificationStore } from '../../stores/notification';
 import { cardService } from '../../services/card';
+import { authService } from '../../services/auth';
 import type { LifeCard, TimeRange } from '../../types/card';
 
 // Tab 类型定义
@@ -112,6 +113,16 @@ Page({
    * 加载初始数据
    */
   async loadInitialData() {
+    // 先检查登录状态，未登录则跳转登录页
+    const isLoggedIn = authService.isLoggedIn();
+    console.log('Index page - isLoggedIn:', isLoggedIn);
+    
+    if (!isLoggedIn) {
+      console.log('Not logged in, redirecting to login page...');
+      wx.reLaunch({ url: '/pages/login/login' });
+      return;
+    }
+
     this.setData({ loading: true });
     
     try {
@@ -132,6 +143,11 @@ Page({
    * 加载未读计数
    */
   async refreshUnreadCount() {
+    // 未登录时不加载
+    if (!authService.isLoggedIn()) {
+      return;
+    }
+
     try {
       await notificationStore.loadUnreadCount();
       this.setData({ unreadCount: notificationStore.totalUnread });

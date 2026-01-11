@@ -47,6 +47,11 @@ Page({
 
       // 2. 调用认证服务进行登录
       const result = await authService.login(userInfo);
+      
+      // 验证 token 是否存储成功
+      const isLoggedIn = authService.isLoggedIn();
+      console.log('After login - isLoggedIn:', isLoggedIn);
+      console.log('After login - token exists:', !!authService.getToken());
 
       // 3. 显示登录成功提示
       if (result.isNewUser) {
@@ -55,9 +60,25 @@ Page({
         wx.showToast({ title: '登录成功', icon: 'success' });
       }
 
+      console.log('Login success, will navigate to index...');
+
       // 4. 跳转到首页
       setTimeout(() => {
-        wx.switchTab({ url: '/pages/index/index' });
+        console.log('Executing switchTab now...');
+        wx.switchTab({
+          url: '/pages/index/index',
+          success: () => {
+            console.log('switchTab success');
+          },
+          fail: (err) => {
+            console.error('switchTab failed:', err);
+            // 备用方案：使用 reLaunch
+            wx.reLaunch({ url: '/pages/index/index' });
+          },
+          complete: () => {
+            console.log('switchTab complete');
+          }
+        });
       }, 1000);
 
     } catch (error) {

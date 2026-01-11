@@ -295,16 +295,17 @@ export const userStore: UserStore = observable({
     if (!this.isLoggedIn) return;
     
     try {
-      const response = await request.get<{ balance: number }>('/api/users/me/balance');
+      // 后端接口是 /api/users/me/coins
+      const response = await request.get<{ coin_balance: number }>('/api/users/me/coins');
       
       // 更新余额
-      this.coinBalance = response.balance;
+      this.coinBalance = response?.coin_balance || 0;
       
       // 同步更新 profile 中的余额
       if (this.profile) {
         this.profile = {
           ...this.profile,
-          coin_balance: response.balance,
+          coin_balance: response?.coin_balance || 0,
         };
         storage.set(StorageKeys.USER_PROFILE, this.profile);
       }

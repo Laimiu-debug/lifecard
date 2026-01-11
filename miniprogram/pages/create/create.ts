@@ -424,20 +424,15 @@ Page({
       };
 
       // 调用 API 创建卡片
-      const result = await cardService.createCard(cardData);
+      const card = await cardService.createCard(cardData);
 
       wx.hideLoading();
 
       // 清除草稿
       this.clearDraft();
 
-      // 更新用户金币余额（Requirements: 3.9 - show earned coins）
-      if (result.coins_earned > 0) {
-        userStore.updateCoinBalance(result.coins_earned);
-      }
-
       // 显示成功消息并跳转到详情页（Requirements: 3.9）
-      this.showSuccessAndNavigate(result.card.id, result.coins_earned);
+      this.showSuccessAndNavigate(card.id, 0);
 
     } catch (error) {
       // Requirements: 3.10 - display error and preserve form data
